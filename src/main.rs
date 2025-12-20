@@ -1,6 +1,6 @@
 use gtk4 as gtk;
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, Button, CheckButton, Entry, Label, Orientation, SpinButton, Adjustment};
+use gtk::{Application, ApplicationWindow, Button, CheckButton, Entry, Label, Orientation, SpinButton, Adjustment, GestureClick, PropagationPhase};
 use rand::{Rng, seq::SliceRandom};
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -79,6 +79,13 @@ fn build_ui(app: &Application) {
     chk_auto_close.set_active(true);
     status_box.append(&chk_auto_close);
 
+    let gesture = GestureClick::new();
+    gesture.set_propagation_phase(PropagationPhase::Capture);
+    gesture.connect_pressed(clone!(@weak chk_auto_close => move |_, _, _, _| {
+        chk_auto_close.set_active(false);
+    }));
+    window.add_controller(gesture);
+
     let lbl_timer = Label::new(None);
     status_box.append(&lbl_timer);
 
@@ -135,7 +142,7 @@ fn build_ui(app: &Application) {
         }
 
         if !chk_auto_close.is_active() {
-            lbl_timer.set_label("Timer pausiert");
+            lbl_timer.set_label("");
             return glib::ControlFlow::Continue;
         }
 
