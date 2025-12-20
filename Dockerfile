@@ -14,7 +14,7 @@ RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.
 
 # Install Runtime and SDK
 # This step downloads large files, so it's good to keep it in the image build
-RUN flatpak install -y flathub org.gnome.Platform//47 org.gnome.Sdk//47 org.freedesktop.Sdk.Extension.rust-stable//24.08
+RUN flatpak install -y flathub org.gnome.Platform//49 org.gnome.Sdk//49 org.freedesktop.Sdk.Extension.rust-stable//25.08
 
 WORKDIR /app
 
