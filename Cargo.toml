@@ -1,0 +1,9 @@
+[package]
+name = "passwordgenerator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gtk4 = { version = "0.9", features = ["v4_10"] }
+glib = "0.20"
+rand = "0.8"
