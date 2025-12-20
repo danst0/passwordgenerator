@@ -5,10 +5,55 @@ use rand::{Rng, seq::SliceRandom};
 use std::cell::RefCell;
 use std::rc::Rc;
 use glib::clone;
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::PathBuf;
 
 const APP_ID: &str = "io.github.danst0.passwordgenerator";
 const DEFAULT_GROUPS: i32 = 3;
 const CLOSE_AFTER_SEC: i32 = 10;
+
+#[derive(Serialize, Deserialize, Debug)]
+struct AppSettings {
+    groups: i32,
+    auto_close: bool,
+    copy_immediately: bool,
+}
+
+impl Default for AppSettings {
+    fn default() -> Self {
+        Self {
+            groups: DEFAULT_GROUPS,
+            auto_close: true,
+            copy_immediately: true,
+        }
+    }
+}
+
+fn get_config_path() -> PathBuf {
+    let mut path = glib::user_config_dir();
+    path.push("passwordgenerator");
+    std::fs::create_dir_all(&path).unwrap_or_default();
+    path.push("settings.json");
+    path
+}
+
+fn load_settings() -> AppSettings {
+    let path = get_config_path();
+    if let Ok(file) = fs::File::open(path) {
+        if let Ok(settings) = serde_json::from_reader(file) {
+            return settings;
+        }
+    }
+    AppSettings::default()
+}
+
+fn save_settings(settings: &AppSettings) {
+    let path = get_config_path();
+    if let Ok(file) = fs::File::create(path) {
+        let _ = serde_json::to_writer(file, settings);
+    }
+}
 
 fn main() {
     let app = Application::builder()
@@ -21,6 +66,8 @@ fn main() {
 }
 
 fn build_ui(app: &Application) {
+    let settings = Rc::new(RefCell::new(load_settings()));
+
     let window = ApplicationWindow::builder()
         .application(app)
         .title("Passwortgenerator")
@@ -57,7 +104,7 @@ fn build_ui(app: &Application) {
     
     box_container.append(&controls_box);
 
-    let adjustment = Adjustment::new(DEFAULT_GROUPS as f64, 1.0, 10.0, 1.0, 1.0, 0.0);
+    let adjustment = Adjustment::new(settings.borrow().groups as f64, 1.0, 10.0, 1.0, 1.0, 0.0);
     let spin_len = SpinButton::new(Some(&adjustment), 1.0, 0);
     spin_len.set_tooltip_text(Some("Anzahl Gruppen (je 5 Zeichen)"));
     controls_box.append(&spin_len);
@@ -76,13 +123,19 @@ fn build_ui(app: &Application) {
     box_container.append(&status_box);
 
     let chk_auto_close = CheckButton::with_label("Auto-Close");
-    chk_auto_close.set_active(true);
+    chk_auto_close.set_active(settings.borrow().auto_close);
     status_box.append(&chk_auto_close);
+
+    let chk_copy_immediately = CheckButton::with_label("Sofort kopieren");
+    chk_copy_immediately.set_active(settings.borrow().copy_immediately);
+    status_box.append(&chk_copy_immediately);
 
     let gesture = GestureClick::new();
     gesture.set_propagation_phase(PropagationPhase::Capture);
-    gesture.connect_pressed(clone!(@weak chk_auto_close => move |_, _, _, _| {
+    gesture.connect_pressed(clone!(@weak chk_auto_close, @strong settings => move |_, _, _, _| {
         chk_auto_close.set_active(false);
+        settings.borrow_mut().auto_close = false;
+        save_settings(&settings.borrow());
     }));
     window.add_controller(gesture);
 
@@ -97,16 +150,19 @@ fn build_ui(app: &Application) {
         let entry = entry.clone();
         let remaining = remaining.clone();
         let window = window.clone();
+        let chk_copy_immediately = chk_copy_immediately.clone();
         move |len: i32| {
             let pw = generate_password(len);
             entry.set_text(&pw);
-            copy_to_clipboard(&window, &pw);
+            if chk_copy_immediately.is_active() {
+                copy_to_clipboard(&window, &pw);
+            }
             *remaining.borrow_mut() = CLOSE_AFTER_SEC;
         }
     };
 
     // Initial password
-    update_password(DEFAULT_GROUPS);
+    update_password(settings.borrow().groups);
 
     // Connect signals
     btn_gen.connect_clicked(clone!(@strong update_password, @weak spin_len => move |_| {
@@ -115,6 +171,27 @@ fn build_ui(app: &Application) {
 
     btn_copy.connect_clicked(clone!(@weak entry, @weak window => move |_| {
         copy_to_clipboard(&window, &entry.text());
+    }));
+
+    // Save settings on change
+    spin_len.connect_value_changed(clone!(@strong settings => move |spin| {
+        settings.borrow_mut().groups = spin.value() as i32;
+        save_settings(&settings.borrow());
+    }));
+
+    chk_auto_close.connect_toggled(clone!(@strong settings => move |chk| {
+        settings.borrow_mut().auto_close = chk.is_active();
+        save_settings(&settings.borrow());
+    }));
+
+    chk_copy_immediately.connect_toggled(clone!(@strong settings, @weak entry, @weak window => move |chk| {
+        let is_active = chk.is_active();
+        settings.borrow_mut().copy_immediately = is_active;
+        save_settings(&settings.borrow());
+
+        if is_active {
+            copy_to_clipboard(&window, &entry.text());
+        }
     }));
 
     // Timer
