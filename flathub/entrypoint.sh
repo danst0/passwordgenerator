@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+REPO_ROOT="/app"
+MANIFEST="flathub/io.github.danst0.passwordgenerator.yml"
+
+cd "${REPO_ROOT}"
+
 echo "Starting build process..."
 
 # Vendor dependencies
@@ -21,7 +26,7 @@ rm -rf build-dir repo
 echo "Building Flatpak..."
 # --sandbox is default, but inside docker we might need to be careful.
 # flatpak-builder uses bubblewrap.
-flatpak-builder --repo=repo --force-clean build-dir io.github.danst0.passwordgenerator.yml
+flatpak-builder --repo=repo --force-clean build-dir "${MANIFEST}"
 
 echo "Creating Bundle..."
 flatpak build-bundle repo passwordgenerator.flatpak io.github.danst0.passwordgenerator

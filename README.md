@@ -31,7 +31,7 @@ cargo run
 
 ### Flatpak Build
 
-This project is set up to be built as a Flatpak. See [BUILD_WITH_DOCKER.md](BUILD_WITH_DOCKER.md) for instructions on building the Flatpak using Docker.
+This project is set up to be built as a Flatpak. See [flathub/BUILD_WITH_DOCKER.md](flathub/BUILD_WITH_DOCKER.md) for instructions on building the Flatpak using Docker.
 
 ## Todo
 

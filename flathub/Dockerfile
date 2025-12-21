@@ -19,7 +19,7 @@ RUN flatpak install -y flathub org.gnome.Platform//49 org.gnome.Sdk//49 org.free
 WORKDIR /app
 
 # Copy the entrypoint script
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY flathub/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Copy the project files
