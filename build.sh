@@ -10,3 +10,5 @@ docker run --privileged --rm -v "$(pwd):/output" passwordgenerator-builder
 
 echo "Done! You can install the flatpak with:"
 echo "flatpak install --user passwordgenerator.flatpak"
+
+flatpak install --user passwordgenerator.flatpak
