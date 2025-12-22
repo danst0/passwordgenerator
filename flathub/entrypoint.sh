@@ -12,6 +12,44 @@ cd "${REPO_ROOT}"
 
 echo "Starting build process..."
 
+VENDOR_DIR="${REPO_ROOT}/vendor"
+CARGO_DIR="${REPO_ROOT}/.cargo"
+CARGO_CONFIG="${CARGO_DIR}/config.toml"
+VENDOR_CREATED=false
+CONFIG_CREATED=false
+CONFIG_BACKUP=""
+
+cleanup_vendor() {
+    if $VENDOR_CREATED && [[ -d "${VENDOR_DIR}" ]]; then
+        rm -rf "${VENDOR_DIR}"
+    fi
+
+    if [[ -n "${CONFIG_BACKUP}" && -f "${CONFIG_BACKUP}" ]]; then
+        mv "${CONFIG_BACKUP}" "${CARGO_CONFIG}"
+    elif $CONFIG_CREATED && [[ -f "${CARGO_CONFIG}" ]]; then
+        rm -f "${CARGO_CONFIG}"
+        rmdir "${CARGO_DIR}" 2>/dev/null || true
+    fi
+}
+
+trap cleanup_vendor EXIT
+
+if [[ -d "${VENDOR_DIR}" ]]; then
+    echo "Removing existing vendor directory before vendoring..."
+    rm -rf "${VENDOR_DIR}"
+fi
+
+mkdir -p "${CARGO_DIR}"
+if [[ -f "${CARGO_CONFIG}" ]]; then
+    CONFIG_BACKUP=$(mktemp)
+    cp "${CARGO_CONFIG}" "${CONFIG_BACKUP}"
+fi
+
+echo "Vendoring dependencies for local Flatpak build..."
+cargo vendor > "${CARGO_CONFIG}"
+VENDOR_CREATED=true
+CONFIG_CREATED=true
+
 # Clean previous builds
 rm -rf build-dir repo
 
