@@ -34,6 +34,9 @@ cargo run
 This project is set up to be built as a Flatpak. See [flathub/BUILD_WITH_DOCKER.md](flathub/BUILD_WITH_DOCKER.md) for instructions on building the Flatpak using Docker.
 
 ## Todo
+- [x] use U+2705 as checkmark for the "copied"-message
+- [x] address all warnings from cargo check
+- [x] only log first letter and length of passwords to std out
 
 - [x] show a green check-mark for 1.5 secs when the copy button is pressed to indicate that copying was successful
 - [x] Translation (Internationalization/Localization)

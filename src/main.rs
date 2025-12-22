@@ -1,12 +1,12 @@
 use gtk4 as gtk;
 use gtk::prelude::*;
-use gtk::{Adjustment, Application, ApplicationWindow, Button, CheckButton, CssProvider, Entry, FlowBox, GestureClick, Image, Label, Orientation, PropagationPhase, Revealer, RevealerTransitionType, SelectionMode, SpinButton};
+use gtk::{Adjustment, Application, ApplicationWindow, Button, CheckButton, CssProvider, Entry, FlowBox, GestureClick, Label, Orientation, PropagationPhase, Revealer, RevealerTransitionType, SelectionMode, SpinButton};
 use gio::{Settings, SettingsSchemaSource};
-use rand::Rng;
+use rand::{seq::SliceRandom, Rng};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::sync::Once;
-use glib::{clone, prelude::Cast, source::SourceId};
+use glib::{prelude::Cast, source::SourceId};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -39,6 +39,8 @@ struct AppSettings {
     allow_digits: bool,
     #[serde(default = "bool_true")]
     allow_special: bool,
+    #[serde(default)]
+    default_strategy: bool,
 }
 
 impl Default for AppSettings {
@@ -51,6 +53,7 @@ impl Default for AppSettings {
             allow_uppercase: true,
             allow_digits: true,
             allow_special: true,
+            default_strategy: false,
         }
     }
 }
@@ -95,6 +98,8 @@ impl GenerationOptions {
     }
 }
 
+type StringsFactory = fn() -> I18nStrings;
+
 #[derive(Clone)]
 struct I18nStrings {
     app_title: &'static str,
@@ -103,6 +108,7 @@ struct I18nStrings {
     copy_button: &'static str,
     auto_close_label: &'static str,
     copy_immediately_label: &'static str,
+    default_strategy_label: &'static str,
     timer_template: &'static str,
     copy_success_label: &'static str,
     charset_section_label: &'static str,
@@ -120,8 +126,11 @@ impl I18nStrings {
     }
 
     fn clipboard_log(&self, password: &str) -> String {
+        let first = password.chars().next().unwrap_or('?');
+        let length = password.chars().count();
         self.clipboard_log_template
-            .replace("{password}", password)
+            .replace("{first}", &first.to_string())
+            .replace("{length}", &length.to_string())
     }
 }
 
@@ -139,17 +148,21 @@ fn strings_for_code(language: &str) -> Option<I18nStrings> {
         .split(|c| c == '-' || c == '_')
         .next()
         .unwrap_or(language);
-    match short {
-        "de" => Some(strings_de()),
-        "ja" => Some(strings_ja()),
-        "sv" => Some(strings_sv()),
-        "es" => Some(strings_es()),
-        "it" => Some(strings_it()),
-        "fr" => Some(strings_fr()),
-        "en" => Some(strings_en()),
-        _ => None,
-    }
+    AVAILABLE_TRANSLATIONS
+        .iter()
+        .find(|(code, _)| *code == short)
+        .map(|(_, factory)| factory())
 }
+
+const AVAILABLE_TRANSLATIONS: &[(&str, StringsFactory)] = &[
+    ("de", strings_de),
+    ("ja", strings_ja),
+    ("sv", strings_sv),
+    ("es", strings_es),
+    ("it", strings_it),
+    ("fr", strings_fr),
+    ("en", strings_en),
+];
 
 fn strings_en() -> I18nStrings {
     I18nStrings {
@@ -159,6 +172,7 @@ fn strings_en() -> I18nStrings {
         copy_button: "Copy",
         auto_close_label: "Auto-Close",
         copy_immediately_label: "Copy immediately",
+        default_strategy_label: "Default strategy",
         timer_template: "Closes in {seconds}s",
         copy_success_label: "Copied",
         charset_section_label: "Character sets",
@@ -166,7 +180,7 @@ fn strings_en() -> I18nStrings {
         uppercase_label: "Uppercase",
         digits_label: "Digits",
         special_label: "Special",
-        clipboard_log_template: "Copied to clipboard: {password}",
+        clipboard_log_template: "Copied to clipboard: first '{first}', length {length}",
     }
 }
 
@@ -178,6 +192,7 @@ fn strings_de() -> I18nStrings {
         copy_button: "Kopieren",
         auto_close_label: "Auto-Schließen",
         copy_immediately_label: "Sofort kopieren",
+        default_strategy_label: "Standardstrategie",
         timer_template: "Schließt in {seconds}s",
         copy_success_label: "Kopiert",
         charset_section_label: "Zeichensätze",
@@ -185,7 +200,7 @@ fn strings_de() -> I18nStrings {
         uppercase_label: "Großbuchstaben",
         digits_label: "Ziffern",
         special_label: "Sonderzeichen",
-        clipboard_log_template: "In Zwischenablage kopiert: {password}",
+        clipboard_log_template: "In Zwischenablage kopiert: erster Buchstabe '{first}', Länge {length}",
     }
 }
 
@@ -197,6 +212,7 @@ fn strings_ja() -> I18nStrings {
         copy_button: "コピー",
         auto_close_label: "自動終了",
         copy_immediately_label: "すぐにコピー",
+        default_strategy_label: "デフォルト戦略",
         timer_template: "あと {seconds} 秒で閉じます",
         copy_success_label: "コピーしました",
         charset_section_label: "文字セット",
@@ -204,7 +220,7 @@ fn strings_ja() -> I18nStrings {
         uppercase_label: "大文字",
         digits_label: "数字",
         special_label: "記号",
-        clipboard_log_template: "クリップボードにコピー: {password}",
+        clipboard_log_template: "クリップボードにコピー: 先頭 '{first}', 長さ {length}",
     }
 }
 
@@ -216,6 +232,7 @@ fn strings_sv() -> I18nStrings {
         copy_button: "Kopiera",
         auto_close_label: "Stäng automatiskt",
         copy_immediately_label: "Kopiera direkt",
+        default_strategy_label: "Standardstrategi",
         timer_template: "Stänger om {seconds}s",
         copy_success_label: "Kopierat",
         charset_section_label: "Teckenuppsättningar",
@@ -223,7 +240,7 @@ fn strings_sv() -> I18nStrings {
         uppercase_label: "Versaler",
         digits_label: "Siffror",
         special_label: "Specialtecken",
-        clipboard_log_template: "Kopierat till urklipp: {password}",
+        clipboard_log_template: "Kopierat till urklipp: första '{first}', längd {length}",
     }
 }
 
@@ -235,6 +252,7 @@ fn strings_es() -> I18nStrings {
         copy_button: "Copiar",
         auto_close_label: "Cierre automático",
         copy_immediately_label: "Copiar al instante",
+        default_strategy_label: "Estrategia predeterminada",
         timer_template: "Se cierra en {seconds}s",
         copy_success_label: "Copiado",
         charset_section_label: "Conjuntos de caracteres",
@@ -242,7 +260,7 @@ fn strings_es() -> I18nStrings {
         uppercase_label: "Mayúsculas",
         digits_label: "Dígitos",
         special_label: "Caracteres especiales",
-        clipboard_log_template: "Copiado al portapapeles: {password}",
+        clipboard_log_template: "Copiado al portapapeles: primera '{first}', longitud {length}",
     }
 }
 
@@ -254,6 +272,7 @@ fn strings_it() -> I18nStrings {
         copy_button: "Copia",
         auto_close_label: "Chiusura automatica",
         copy_immediately_label: "Copia immediata",
+        default_strategy_label: "Strategia predefinita",
         timer_template: "Si chiude tra {seconds}s",
         copy_success_label: "Copiato",
         charset_section_label: "Set di caratteri",
@@ -261,7 +280,7 @@ fn strings_it() -> I18nStrings {
         uppercase_label: "Maiuscole",
         digits_label: "Numeri",
         special_label: "Caratteri speciali",
-        clipboard_log_template: "Copiato negli appunti: {password}",
+        clipboard_log_template: "Copiato negli appunti: prima '{first}', lunghezza {length}",
     }
 }
 
@@ -273,6 +292,7 @@ fn strings_fr() -> I18nStrings {
         copy_button: "Copier",
         auto_close_label: "Fermeture auto",
         copy_immediately_label: "Copier immédiatement",
+        default_strategy_label: "Stratégie par défaut",
         timer_template: "Fermeture dans {seconds}s",
         copy_success_label: "Copié",
         charset_section_label: "Jeux de caractères",
@@ -280,7 +300,27 @@ fn strings_fr() -> I18nStrings {
         uppercase_label: "Majuscules",
         digits_label: "Chiffres",
         special_label: "Caractères spéciaux",
-        clipboard_log_template: "Copié dans le presse-papiers : {password}",
+        clipboard_log_template: "Copié dans le presse-papiers : première '{first}', longueur {length}",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn translations_cover_all_languages() {
+        for (code, factory) in AVAILABLE_TRANSLATIONS {
+            let strings = factory();
+            assert!(
+                !strings.app_title.is_empty()
+                    && !strings.generate_button.is_empty()
+                    && !strings.copy_button.is_empty()
+                    && !strings.default_strategy_label.is_empty(),
+                "Missing strings for language code {}",
+                code
+            );
+        }
     }
 }
 
@@ -290,14 +330,12 @@ fn ensure_system_color_scheme() {
             if has_gsettings_schema("org.gnome.desktop.interface") {
                 let interface_settings = Settings::new("org.gnome.desktop.interface");
                 apply_system_color_preference(&gtk_settings, &interface_settings);
-                interface_settings.connect_changed(
-                    Some("color-scheme"),
-                    clone!(@weak gtk_settings => move |settings, key| {
-                        if key == "color-scheme" {
-                            apply_system_color_preference(&gtk_settings, settings);
-                        }
-                    }),
-                );
+                let gtk_settings_for_change = gtk_settings.clone();
+                interface_settings.connect_changed(Some("color-scheme"), move |settings, key| {
+                    if key == "color-scheme" {
+                        apply_system_color_preference(&gtk_settings_for_change, settings);
+                    }
+                });
                 unsafe {
                     gtk_settings.set_data("system-color-settings", interface_settings);
                 }
@@ -461,7 +499,7 @@ fn build_ui(app: &Application) {
         .halign(gtk::Align::Center)
         .build();
     copy_feedback_box.add_css_class("copy-feedback-box");
-    let copy_feedback_icon = Image::from_icon_name("emblem-ok-symbolic");
+    let copy_feedback_icon = Label::new(Some("✅"));
     copy_feedback_icon.add_css_class("copy-feedback-icon");
     let copy_feedback_label = Label::new(Some(strings.copy_success_label));
     copy_feedback_label.add_css_class("copy-feedback-label");
@@ -519,6 +557,10 @@ fn build_ui(app: &Application) {
     chk_copy_immediately.set_active(settings.borrow().copy_immediately);
     status_box.append(&chk_copy_immediately);
 
+    let chk_default_strategy = CheckButton::with_label(strings.default_strategy_label);
+    chk_default_strategy.set_active(settings.borrow().default_strategy);
+    status_box.append(&chk_default_strategy);
+
     let lbl_timer = Label::new(None);
     status_box.append(&lbl_timer);
 
@@ -527,12 +569,20 @@ fn build_ui(app: &Application) {
 
     let gesture = GestureClick::new();
     gesture.set_propagation_phase(PropagationPhase::Capture);
-    gesture.connect_pressed(clone!(@weak chk_auto_close, @weak lbl_timer, @strong runtime_auto_close_active => move |_, _, _, _| {
-        if chk_auto_close.is_active() && runtime_auto_close_active.get() {
-            runtime_auto_close_active.set(false);
-            lbl_timer.set_label("");
+    let chk_auto_close_weak = chk_auto_close.downgrade();
+    let lbl_timer_weak = lbl_timer.downgrade();
+    let runtime_auto_close_active_for_gesture = runtime_auto_close_active.clone();
+    gesture.connect_pressed(move |_, _, _, _| {
+        if let (Some(chk_auto_close), Some(lbl_timer)) = (
+            chk_auto_close_weak.upgrade(),
+            lbl_timer_weak.upgrade(),
+        ) {
+            if chk_auto_close.is_active() && runtime_auto_close_active_for_gesture.get() {
+                runtime_auto_close_active_for_gesture.set(false);
+                lbl_timer.set_label("");
+            }
         }
-    }));
+    });
     window.add_controller(gesture);
 
     let pending_copy = Rc::new(RefCell::new(None::<String>));
@@ -572,6 +622,7 @@ fn build_ui(app: &Application) {
         let settings = settings.clone();
         let guard = charset_guard.clone();
         let buttons = charset_buttons.clone();
+        let default_strategy_btn = chk_default_strategy.clone();
         chk_lowercase.connect_toggled(move |btn| {
             if guard.get() {
                 return;
@@ -583,6 +634,11 @@ fn build_ui(app: &Application) {
                 return;
             }
             let active = btn.is_active();
+
+            if !active && default_strategy_btn.is_active() {
+                default_strategy_btn.set_active(false);
+            }
+
             {
                 let mut config = settings.borrow_mut();
                 config.allow_lowercase = active;
@@ -665,6 +721,7 @@ fn build_ui(app: &Application) {
         let remaining = remaining.clone();
         let window = window.clone();
         let chk_copy_immediately = chk_copy_immediately.clone();
+        let chk_default_strategy = chk_default_strategy.clone();
         let pending_copy = pending_copy.clone();
         let runtime_auto_close_active = runtime_auto_close_active.clone();
         let chk_auto_close = chk_auto_close.clone();
@@ -682,12 +739,14 @@ fn build_ui(app: &Application) {
                 chk_special.is_active(),
             );
 
-            if !options.is_valid() {
+            let use_default_strategy = chk_default_strategy.is_active();
+
+            if !use_default_strategy && !options.is_valid() {
                 entry.set_text("");
                 return;
             }
 
-            let password = generate_password(len, &options);
+            let password = generate_password(len, &options, use_default_strategy);
             entry.set_text(&password);
 
             if chk_copy_immediately.is_active() {
@@ -709,55 +768,97 @@ fn build_ui(app: &Application) {
         }
     };
 
-    btn_gen.connect_clicked(clone!(@strong update_password, @weak spin_len => move |_| {
-        update_password(spin_len.value() as i32);
-    }));
+    let update_password_for_button = update_password.clone();
+    let spin_len_weak = spin_len.downgrade();
+    btn_gen.connect_clicked(move |_| {
+        if let Some(spin_len) = spin_len_weak.upgrade() {
+            update_password_for_button(spin_len.value() as i32);
+        }
+    });
 
-    btn_copy.connect_clicked(clone!(@weak entry, @weak window, @strong strings, @strong show_copy_feedback => move |_| {
-        let text = entry.text().to_string();
-        copy_to_clipboard(&window, &text);
-        println!("{}", strings.clipboard_log(&text));
-        show_copy_feedback();
-    }));
+    let entry_weak_for_copy = entry.downgrade();
+    let window_weak_for_copy = window.downgrade();
+    let strings_for_copy = strings.clone();
+    let show_copy_feedback_for_button = show_copy_feedback.clone();
+    btn_copy.connect_clicked(move |_| {
+        if let (Some(entry), Some(window)) = (
+            entry_weak_for_copy.upgrade(),
+            window_weak_for_copy.upgrade(),
+        ) {
+            let text = entry.text().to_string();
+            copy_to_clipboard(&window, &text);
+            println!("{}", strings_for_copy.clipboard_log(&text));
+            show_copy_feedback_for_button();
+        }
+    });
 
-    spin_len.connect_value_changed(clone!(@strong settings => move |spin| {
-        settings.borrow_mut().groups = spin.value() as i32;
-        save_settings(&settings.borrow());
-    }));
+    let settings_for_spin = settings.clone();
+    spin_len.connect_value_changed(move |spin| {
+        settings_for_spin.borrow_mut().groups = spin.value() as i32;
+        save_settings(&settings_for_spin.borrow());
+    });
 
-    chk_auto_close.connect_toggled(clone!(@strong settings, @strong remaining, @strong runtime_auto_close_active, @weak lbl_timer => move |chk| {
+    let settings_for_auto_close = settings.clone();
+    let remaining_for_auto_close = remaining.clone();
+    let runtime_auto_close_flag = runtime_auto_close_active.clone();
+    let lbl_timer_weak = lbl_timer.downgrade();
+    chk_auto_close.connect_toggled(move |chk| {
         let is_active = chk.is_active();
-        settings.borrow_mut().auto_close = is_active;
-        save_settings(&settings.borrow());
+        settings_for_auto_close.borrow_mut().auto_close = is_active;
+        save_settings(&settings_for_auto_close.borrow());
 
-        runtime_auto_close_active.set(is_active);
+        runtime_auto_close_flag.set(is_active);
 
         if is_active {
-            *remaining.borrow_mut() = CLOSE_AFTER_SEC;
-        } else {
+            *remaining_for_auto_close.borrow_mut() = CLOSE_AFTER_SEC;
+        } else if let Some(lbl_timer) = lbl_timer_weak.upgrade() {
             lbl_timer.set_label("");
         }
-    }));
+    });
 
-    chk_copy_immediately.connect_toggled(clone!(@strong settings, @weak entry, @weak window, @strong pending_copy, @strong strings, @strong show_copy_feedback => move |chk| {
+    let settings_for_copy_toggle = settings.clone();
+    let entry_weak_for_toggle = entry.downgrade();
+    let window_weak_for_toggle = window.downgrade();
+    let pending_copy_for_toggle = pending_copy.clone();
+    let strings_for_copy_toggle = strings.clone();
+    let show_copy_feedback_for_toggle = show_copy_feedback.clone();
+    chk_copy_immediately.connect_toggled(move |chk| {
         let is_active = chk.is_active();
-        settings.borrow_mut().copy_immediately = is_active;
-        save_settings(&settings.borrow());
+        settings_for_copy_toggle.borrow_mut().copy_immediately = is_active;
+        save_settings(&settings_for_copy_toggle.borrow());
 
         if is_active {
-            let text = entry.text().to_string();
-            if window_is_active(&window) {
-                copy_to_clipboard(&window, &text);
-                println!("{}", strings.clipboard_log(&text));
-                show_copy_feedback();
-                pending_copy.borrow_mut().take();
-            } else {
-                *pending_copy.borrow_mut() = Some(text);
+            if let (Some(entry), Some(window)) = (
+                entry_weak_for_toggle.upgrade(),
+                window_weak_for_toggle.upgrade(),
+            ) {
+                let text = entry.text().to_string();
+                if window_is_active(&window) {
+                    copy_to_clipboard(&window, &text);
+                    println!("{}", strings_for_copy_toggle.clipboard_log(&text));
+                    show_copy_feedback_for_toggle();
+                    pending_copy_for_toggle.borrow_mut().take();
+                } else {
+                    *pending_copy_for_toggle.borrow_mut() = Some(text);
+                }
             }
         } else {
-            pending_copy.borrow_mut().take();
+            pending_copy_for_toggle.borrow_mut().take();
         }
-    }));
+    });
+
+    let settings_for_strategy = settings.clone();
+    let chk_lowercase_for_strategy = chk_lowercase.clone();
+    chk_default_strategy.connect_toggled(move |chk| {
+        let is_active = chk.is_active();
+
+        if is_active && !chk_lowercase_for_strategy.is_active() {
+            chk_lowercase_for_strategy.set_active(true);
+        }
+
+        settings_for_strategy.borrow_mut().default_strategy = is_active;
+        save_settings(&settings_for_strategy.borrow());
+    });
 
     let window_weak = window.downgrade();
     let lbl_timer_weak = lbl_timer.downgrade();
@@ -803,38 +904,75 @@ fn build_ui(app: &Application) {
 
     window.present();
 
-    window.connect_notify_local(
-        Some("is-active"),
-        clone!(@strong pending_copy, @strong strings, @strong show_copy_feedback => move |win: &ApplicationWindow, _| {
-            if window_is_active(win) {
-                if let Some(text) = pending_copy.borrow_mut().take() {
-                    copy_to_clipboard(win, &text);
-                    println!("{}", strings.clipboard_log(&text));
-                    show_copy_feedback();
-                }
+    let pending_copy_for_notify = pending_copy.clone();
+    let strings_for_notify = strings.clone();
+    let show_copy_feedback_for_notify = show_copy_feedback.clone();
+    window.connect_notify_local(Some("is-active"), move |win: &ApplicationWindow, _| {
+        if window_is_active(win) {
+            if let Some(text) = pending_copy_for_notify.borrow_mut().take() {
+                copy_to_clipboard(win, &text);
+                println!("{}", strings_for_notify.clipboard_log(&text));
+                show_copy_feedback_for_notify();
             }
-        }),
-    );
+        }
+    });
 
-    glib::idle_add_local_once(clone!(@strong update_password, @strong settings => move || {
-        update_password(settings.borrow().groups);
-    }));
+    let update_password_for_idle = update_password.clone();
+    let settings_for_idle = settings.clone();
+    glib::idle_add_local_once(move || {
+        update_password_for_idle(settings_for_idle.borrow().groups);
+    });
 }
 
-fn generate_password(groups: i32, options: &GenerationOptions) -> String {
+fn generate_password(groups: i32, options: &GenerationOptions, use_default_strategy: bool) -> String {
     let mut rng = rand::thread_rng();
     let total_groups = groups.max(1);
-    let total_chars = total_groups * 5;
+    let total_chars = (total_groups * 5) as usize;
 
-    let pool = options.pool();
-    if pool.is_empty() {
-        return String::new();
-    }
+    let mut password_chars: Vec<u8>;
 
-    let mut password_chars: Vec<u8> = Vec::with_capacity(total_chars as usize);
-    for _ in 0..total_chars {
-        let idx = rng.gen_range(0..pool.len());
-        password_chars.push(pool[idx]);
+    if use_default_strategy {
+        password_chars = vec![0u8; total_chars];
+        for ch in password_chars.iter_mut() {
+            let idx = rng.gen_range(0..LOWER.len());
+            *ch = LOWER[idx];
+        }
+
+        let mut forced_pools: Vec<&[u8]> = Vec::new();
+        if options.uppercase {
+            forced_pools.push(UPPER);
+        }
+        if options.digits {
+            forced_pools.push(DIGITS);
+        }
+        if options.special {
+            forced_pools.push(SPECIAL);
+        }
+
+        if forced_pools.len() > total_chars {
+            return String::new();
+        }
+
+        let mut positions: Vec<usize> = (0..total_chars).collect();
+        positions.shuffle(&mut rng);
+
+        for pool in forced_pools {
+            if let Some(pos) = positions.pop() {
+                let idx = rng.gen_range(0..pool.len());
+                password_chars[pos] = pool[idx];
+            }
+        }
+    } else {
+        let pool = options.pool();
+        if pool.is_empty() {
+            return String::new();
+        }
+
+        password_chars = Vec::with_capacity(total_chars);
+        for _ in 0..total_chars {
+            let idx = rng.gen_range(0..pool.len());
+            password_chars.push(pool[idx]);
+        }
     }
 
     password_chars
