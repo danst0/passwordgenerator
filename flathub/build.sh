@@ -10,8 +10,11 @@ echo "Building Docker image..."
 docker build -t passwordgenerator-builder -f "${SCRIPT_DIR}/Dockerfile" "${REPO_ROOT}"
 
 echo "Running build container..."
-# We mount the current directory to /output so the container can write the flatpak file back to us
-docker run --privileged --rm -v "$(pwd):/output" passwordgenerator-builder
+# Mount the project for building and the repo again for collecting output
+docker run --privileged --rm \
+	-v "$(pwd):/workspace" \
+	-v "$(pwd):/output" \
+	passwordgenerator-builder
 
 echo "Done! You can install the flatpak with:"
 echo "flatpak install --user passwordgenerator.flatpak"

@@ -1,24 +1,16 @@
 #!/bin/bash
 set -e
 
-REPO_ROOT="/app"
+if [[ -d "/workspace" ]]; then
+    REPO_ROOT="/workspace"
+else
+    REPO_ROOT="/app"
+fi
 MANIFEST="flathub/io.github.danst0.passwordgenerator.yml"
 
 cd "${REPO_ROOT}"
 
 echo "Starting build process..."
-
-# Vendor dependencies
-# This downloads all Rust dependencies and configures cargo to use them offline
-if [ ! -d "vendor" ]; then
-    echo "Vendoring dependencies..."
-    mkdir -p .cargo
-    cargo vendor > .cargo/config.toml
-    # Append to existing config if needed, but here we overwrite or create
-    # If you have custom config, you might want to merge.
-else
-    echo "Vendor directory already exists."
-fi
 
 # Clean previous builds
 rm -rf build-dir repo
