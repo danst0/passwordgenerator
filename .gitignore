@@ -14,3 +14,4 @@ build-dir/
 repo/
 *.flatpak
 cargo-sources.json
+scripts/publish_flathub.sh
