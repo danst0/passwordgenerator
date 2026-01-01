@@ -1,7 +1,7 @@
 use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{Adjustment, Application, ApplicationWindow, Button, CheckButton, CssProvider, Entry, FlowBox, GestureClick, Label, Orientation, PropagationPhase, Revealer, RevealerTransitionType, SelectionMode, SpinButton};
-use gio::{Settings, SettingsSchemaSource};
+use gio::{prelude::*, Settings, SettingsSchemaSource, SimpleAction};
 use rand::{seq::SliceRandom, Rng};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -418,6 +418,16 @@ fn main() {
         .application_id(APP_ID)
         .build();
 
+    let app_weak = app.downgrade();
+    let quit_action = SimpleAction::new("quit", None);
+    quit_action.connect_activate(move |_, _| {
+        if let Some(app) = app_weak.upgrade() {
+            app.quit();
+        }
+    });
+    app.add_action(&quit_action);
+    app.set_accels_for_action("app.quit", &["<Control>q"]);
+
     app.connect_activate(build_ui);
 
     app.run();
@@ -451,6 +461,17 @@ fn build_ui(app: &Application) {
         .default_width(420)
         .default_height(320)
         .build();
+
+    let window_weak = window.downgrade();
+    let close_action = SimpleAction::new("close", None);
+    close_action.connect_activate(move |_, _| {
+        if let Some(window) = window_weak.upgrade() {
+            window.close();
+        }
+    });
+    window.add_action(&close_action);
+    app.set_accels_for_action("win.close", &["<Control>w"]);
+
     install_custom_css(&window);
 
     let box_container = gtk::Box::builder()

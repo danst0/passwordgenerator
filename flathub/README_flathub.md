@@ -2,9 +2,9 @@
 
 This repository packages the Password Generator GTK4 app as a Flatpak for Flathub.
 
-## Screenshot (v0.4.0)
+## Screenshot (v0.5.0)
 
-![Password Generator v0.4.0 UI](../screenshots/v0.4.0.png)
+![Password Generator v0.5.0 UI](../screenshots/v0.4.0.png)
 
 ## Highlights
 
