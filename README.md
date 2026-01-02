@@ -42,3 +42,7 @@ This project is set up to be built as a Flatpak. See [flathub/BUILD_WITH_DOCKER.
 - [x] Translation (Internationalization/Localization)
 - [x] Add dark mode support
 - [x] Add more character set options (e.g., exclude special characters)
+
+## License
+
+This project is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License - see the [LICENSE](LICENSE) file for details.

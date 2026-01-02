@@ -1,7 +1,8 @@
 [package]
 name = "passwordgenerator"
-version = "0.5.2"
+version = "0.5.3"
 edition = "2021"
+license = "CC-BY-SA-4.0"
 
 [dependencies]
 gtk4 = { version = "0.9", features = ["v4_10"] }
