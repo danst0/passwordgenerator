@@ -1,7 +1,7 @@
 use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{Adjustment, Application, ApplicationWindow, Button, CheckButton, CssProvider, Entry, FlowBox, GestureClick, Label, Orientation, PropagationPhase, Revealer, RevealerTransitionType, SelectionMode, SpinButton};
-use gio::{prelude::*, Settings, SettingsSchemaSource, SimpleAction};
+use gio::{Settings, SettingsSchemaSource, SimpleAction};
 use rand::{seq::SliceRandom, Rng};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -800,6 +800,7 @@ fn build_ui(app: &Application) {
     let entry_weak_for_copy = entry.downgrade();
     let window_weak_for_copy = window.downgrade();
     let strings_for_copy = strings.clone();
+    let pending_copy_for_button = pending_copy.clone();
     let show_copy_feedback_for_button = show_copy_feedback.clone();
     btn_copy.connect_clicked(move |_| {
         if let (Some(entry), Some(window)) = (
@@ -807,9 +808,16 @@ fn build_ui(app: &Application) {
             window_weak_for_copy.upgrade(),
         ) {
             let text = entry.text().to_string();
-            copy_to_clipboard(&window, &text);
-            println!("{}", strings_for_copy.clipboard_log(&text));
-            show_copy_feedback_for_button();
+            if window_is_active(&window) {
+                copy_to_clipboard(&window, &text);
+                println!("{}", strings_for_copy.clipboard_log(&text));
+                show_copy_feedback_for_button();
+                pending_copy_for_button.borrow_mut().take();
+            } else {
+                // Defer copying until the window gains focus (needed on Wayland)
+                *pending_copy_for_button.borrow_mut() = Some(text.clone());
+                window.present();
+            }
         }
     });
 
