@@ -3,7 +3,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-MANIFEST="${SCRIPT_DIR}/io.github.danst0.passwordgenerator.yml"
+MANIFEST="${SCRIPT_DIR}/io.github.danst0.passwordgenerator.local.yml"
 
 cd "${REPO_ROOT}"
 

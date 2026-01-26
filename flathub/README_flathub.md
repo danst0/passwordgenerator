@@ -46,7 +46,9 @@ flatpak run io.github.danst0.passwordgenerator
 
 ## Files
 
-- `io.github.danst0.passwordgenerator.yml` - Local build manifest (uses local source)
-- `io.github.danst0.passwordgenerator.flathub.yml` - Flathub submission manifest (uses git tags)
-- `build.sh` - Build script
+- `io.github.danst0.passwordgenerator.yml` - Flathub submission manifest (uses git tags + cargo-sources.json)
+- `io.github.danst0.passwordgenerator.local.yml` - Local build manifest (uses local source)
+- `cargo-sources.json` - Vendored cargo dependencies for offline Flathub builds
+- `flatpak-cargo-generator.py` - Tool to regenerate cargo-sources.json from Cargo.lock
+- `build.sh` - Local build script
 - `clean.sh` - Cleanup script
