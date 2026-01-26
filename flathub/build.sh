@@ -29,6 +29,19 @@ if ! flatpak info org.freedesktop.Sdk.Extension.rust-stable//25.08 &> /dev/null;
     echo "Installing org.freedesktop.Sdk.Extension.rust-stable//25.08..."
     flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//25.08
 fi
+if ! flatpak info org.flatpak.Builder &> /dev/null; then
+    echo "Installing org.flatpak.Builder (for linter)..."
+    flatpak install -y flathub org.flatpak.Builder
+fi
+
+# Lint the Flathub manifest
+FLATHUB_MANIFEST="${SCRIPT_DIR}/io.github.danst0.passwordgenerator.yml"
+echo "Linting Flathub manifest..."
+if ! flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest "${FLATHUB_MANIFEST}"; then
+    echo "Error: Flathub manifest failed linting"
+    exit 1
+fi
+echo "Manifest passed linting."
 
 # Vendor dependencies
 VENDOR_DIR="${REPO_ROOT}/vendor"
