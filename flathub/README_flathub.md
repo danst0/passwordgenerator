@@ -44,6 +44,21 @@ flatpak run io.github.danst0.passwordgenerator
 ./flathub/clean.sh
 ```
 
+## Publishing to Flathub
+
+After tagging a release, publish to Flathub:
+
+```bash
+./flathub/publish.sh
+```
+
+This will:
+1. Get the latest tag and commit
+2. Update the Flathub repo manifest
+3. Copy cargo-sources.json
+4. Lint the manifest
+5. Commit and push to Flathub
+
 ## Files
 
 - `io.github.danst0.passwordgenerator.yml` - Flathub submission manifest (uses git tags + cargo-sources.json)
@@ -51,4 +66,5 @@ flatpak run io.github.danst0.passwordgenerator
 - `cargo-sources.json` - Vendored cargo dependencies for offline Flathub builds
 - `flatpak-cargo-generator.py` - Tool to regenerate cargo-sources.json from Cargo.lock
 - `build.sh` - Local build script
+- `publish.sh` - Publish to Flathub script
 - `clean.sh` - Cleanup script
