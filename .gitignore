@@ -6,13 +6,11 @@ deploy_key.pub
 
 # Python
 .venv/
-flatpak-cargo-generator.py
 
 # Flatpak
 .flatpak-builder/
 build-dir/
 repo/
 *.flatpak
-cargo-sources.json
 scripts/publish_flathub.sh
 .cargo/
