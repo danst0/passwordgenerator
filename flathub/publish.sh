@@ -13,6 +13,12 @@ if [[ ! -d "${FLATHUB_REPO}/.git" ]]; then
     exit 1
 fi
 
+# Check for gh CLI
+if ! command -v gh &> /dev/null; then
+    echo "Error: gh (GitHub CLI) is required"
+    exit 1
+fi
+
 # Get latest tag
 LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
 if [[ -z "${LATEST_TAG}" ]]; then
@@ -31,7 +37,17 @@ git fetch origin
 git checkout master 2>/dev/null || git checkout main
 git pull
 
-# Copy manifest from main repo and update it
+# Check if branch already exists
+BRANCH_NAME="${LATEST_TAG}"
+if git show-ref --verify --quiet "refs/heads/${BRANCH_NAME}"; then
+    echo "Branch ${BRANCH_NAME} already exists locally, deleting..."
+    git branch -D "${BRANCH_NAME}"
+fi
+
+# Create new branch
+git checkout -b "${BRANCH_NAME}"
+
+# Copy manifest from main repo
 cp "${REPO_ROOT}/flathub/io.github.danst0.passwordgenerator.yml" .
 
 # Update tag and commit in manifest
@@ -45,6 +61,7 @@ cp "${REPO_ROOT}/flathub/cargo-sources.json" .
 echo "Linting manifest..."
 if ! flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest io.github.danst0.passwordgenerator.yml; then
     echo "Error: Manifest failed linting"
+    git checkout master
     exit 1
 fi
 echo "Manifest passed linting."
@@ -54,21 +71,37 @@ echo ""
 echo "Changes to commit:"
 git diff --stat
 echo ""
-git diff
 
-# Confirm
-read -p "Commit and push to Flathub? [y/N] " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Aborted."
+# Check if there are changes
+if git diff --quiet && git diff --cached --quiet; then
+    echo "No changes to commit."
+    git checkout master
     exit 0
 fi
 
-# Commit and push
+# Commit
 git add io.github.danst0.passwordgenerator.yml cargo-sources.json
 git commit -m "Update to ${LATEST_TAG}"
-git push
+
+# Push branch
+echo "Pushing branch ${BRANCH_NAME}..."
+git push -u origin "${BRANCH_NAME}" --force
+
+# Create PR
+echo "Creating pull request..."
+PR_URL=$(gh pr create --title "Update to ${LATEST_TAG}" --body "Automated update to ${LATEST_TAG}" --base master 2>&1) || true
+
+if [[ "${PR_URL}" == *"already exists"* ]]; then
+    echo "PR already exists, updating..."
+    PR_URL=$(gh pr view --json url -q '.url' 2>/dev/null || echo "")
+fi
+
+# Return to master
+git checkout master
 
 echo ""
 echo "Published ${LATEST_TAG} to Flathub!"
+if [[ -n "${PR_URL}" ]]; then
+    echo "PR: ${PR_URL}"
+fi
 echo "Check build status at: https://buildbot.flathub.org/#/apps/io.github.danst0.passwordgenerator"
