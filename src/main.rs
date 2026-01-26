@@ -931,25 +931,57 @@ fn build_ui(app: &Application) {
         glib::ControlFlow::Continue
     });
 
-    window.present();
-
+    // Register is-active handler BEFORE present() to catch focus changes
     let pending_copy_for_notify = pending_copy.clone();
     let strings_for_notify = strings.clone();
     let show_copy_feedback_for_notify = show_copy_feedback.clone();
     window.connect_notify_local(Some("is-active"), move |win: &ApplicationWindow, _| {
         if window_is_active(win) {
             if let Some(text) = pending_copy_for_notify.borrow_mut().take() {
-                copy_to_clipboard(win, &text);
-                println!("{}", strings_for_notify.clipboard_log(&text));
-                show_copy_feedback_for_notify();
+                // Defer clipboard write to allow Wayland to fully process focus
+                let win = win.clone();
+                let strings = strings_for_notify.clone();
+                let show_feedback = show_copy_feedback_for_notify.clone();
+                glib::timeout_add_local_once(Duration::from_millis(50), move || {
+                    copy_to_clipboard(&win, &text);
+                    println!("{}", strings.clipboard_log(&text));
+                    show_feedback();
+                });
             }
         }
     });
 
+    window.present();
+
+    // Generate initial password
     let update_password_for_idle = update_password.clone();
     let settings_for_idle = settings.clone();
     glib::idle_add_local_once(move || {
         update_password_for_idle(settings_for_idle.borrow().groups);
+    });
+
+    // Fallback: if window was already active when handler registered, notification won't fire
+    let pending_copy_for_fallback = pending_copy.clone();
+    let window_for_fallback = window.clone();
+    let strings_for_fallback = strings.clone();
+    let show_copy_feedback_for_fallback = show_copy_feedback.clone();
+    glib::timeout_add_local_once(Duration::from_millis(250), move || {
+        if let Some(text) = pending_copy_for_fallback.borrow_mut().take() {
+            if window_is_active(&window_for_fallback) {
+                // Defer clipboard write to allow Wayland to fully process focus
+                let win = window_for_fallback.clone();
+                let strings = strings_for_fallback.clone();
+                let show_feedback = show_copy_feedback_for_fallback.clone();
+                glib::timeout_add_local_once(Duration::from_millis(50), move || {
+                    copy_to_clipboard(&win, &text);
+                    println!("{}", strings.clipboard_log(&text));
+                    show_feedback();
+                });
+            } else {
+                // Window still not active - restore for notification handler
+                *pending_copy_for_fallback.borrow_mut() = Some(text);
+            }
+        }
     });
 }
 
