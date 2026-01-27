@@ -771,14 +771,23 @@ fn build_ui(app: &Application) {
             entry.set_text(&password);
 
             if chk_copy_immediately.is_active() {
+                // Always set pending_copy first, then schedule a delayed copy if window is active.
+                // This ensures Wayland has time to process focus before clipboard write.
+                *pending_copy.borrow_mut() = Some(password.clone());
                 if window_is_active(&window) {
-                    copy_to_clipboard(&window, &password);
-                    println!("{}", strings.clipboard_log(&password));
-                    show_copy_feedback();
-                    pending_copy.borrow_mut().take();
-                } else {
-                    *pending_copy.borrow_mut() = Some(password.clone());
+                    let window = window.clone();
+                    let pending_copy = pending_copy.clone();
+                    let strings = strings.clone();
+                    let show_copy_feedback = show_copy_feedback.clone();
+                    glib::timeout_add_local_once(Duration::from_millis(50), move || {
+                        if let Some(text) = pending_copy.borrow_mut().take() {
+                            copy_to_clipboard(&window, &text);
+                            println!("{}", strings.clipboard_log(&text));
+                            show_copy_feedback();
+                        }
+                    });
                 }
+                // If window not active, notify handler or fallback will handle it
             } else {
                 pending_copy.borrow_mut().take();
             }
