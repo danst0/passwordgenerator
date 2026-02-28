@@ -2,7 +2,7 @@ use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{Adjustment, Application, ApplicationWindow, Button, CheckButton, CssProvider, Entry, FlowBox, GestureClick, Label, Orientation, PropagationPhase, Revealer, RevealerTransitionType, SelectionMode, SpinButton};
 use gio::{Settings, SettingsSchemaSource, SimpleAction};
-use rand::{seq::SliceRandom, Rng};
+use rand::{seq::SliceRandom, Rng, rngs::OsRng};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::sync::Once;
@@ -995,7 +995,7 @@ fn build_ui(app: &Application) {
 }
 
 fn generate_password(groups: i32, options: &GenerationOptions, use_default_strategy: bool) -> String {
-    let mut rng = rand::thread_rng();
+    let mut rng = OsRng;
     let total_groups = groups.max(1);
     let total_chars = (total_groups * 5) as usize;
 
