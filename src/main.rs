@@ -5,7 +5,8 @@ use gio::{Settings, SettingsSchemaSource, SimpleAction};
 use rand::{seq::SliceRandom, Rng, rngs::OsRng};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
-use std::sync::Once;
+use std::sync::atomic::{AtomicU8, Ordering};
+use std::sync::{Arc, Once};
 use glib::{prelude::Cast, source::SourceId};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -606,7 +607,7 @@ fn build_ui(app: &Application) {
     });
     window.add_controller(gesture);
 
-    let pending_copy = Rc::new(RefCell::new(None::<String>));
+    let copy_state = CopyState::new();
 
     let feedback_timeout = Rc::new(RefCell::new(None::<SourceId>));
     let show_copy_feedback: Rc<dyn Fn()> = {
@@ -743,7 +744,7 @@ fn build_ui(app: &Application) {
         let window = window.clone();
         let chk_copy_immediately = chk_copy_immediately.clone();
         let chk_default_strategy = chk_default_strategy.clone();
-        let pending_copy = pending_copy.clone();
+        let copy_state = copy_state.clone();
         let runtime_auto_close_active = runtime_auto_close_active.clone();
         let chk_auto_close = chk_auto_close.clone();
         let chk_lowercase = chk_lowercase.clone();
@@ -771,25 +772,15 @@ fn build_ui(app: &Application) {
             entry.set_text(&password);
 
             if chk_copy_immediately.is_active() {
-                // Always set pending_copy first, then schedule a delayed copy if window is active.
-                // This ensures Wayland has time to process focus before clipboard write.
-                *pending_copy.borrow_mut() = Some(password.clone());
-                if window_is_active(&window) {
-                    let window = window.clone();
-                    let pending_copy = pending_copy.clone();
-                    let strings = strings.clone();
-                    let show_copy_feedback = show_copy_feedback.clone();
-                    glib::timeout_add_local_once(Duration::from_millis(50), move || {
-                        if let Some(text) = pending_copy.borrow_mut().take() {
-                            copy_to_clipboard(&window, &text);
-                            println!("{}", strings.clipboard_log(&text));
-                            show_copy_feedback();
-                        }
-                    });
-                }
-                // If window not active, notify handler or fallback will handle it
+                schedule_auto_copy(
+                    &window,
+                    copy_state.clone(),
+                    show_copy_feedback.clone(),
+                    strings.clone(),
+                    password.clone(),
+                );
             } else {
-                pending_copy.borrow_mut().take();
+                copy_state.cancel();
             }
 
             if runtime_auto_close_active.get() && chk_auto_close.is_active() {
@@ -809,7 +800,7 @@ fn build_ui(app: &Application) {
     let entry_weak_for_copy = entry.downgrade();
     let window_weak_for_copy = window.downgrade();
     let strings_for_copy = strings.clone();
-    let pending_copy_for_button = pending_copy.clone();
+    let copy_state_for_button = copy_state.clone();
     let show_copy_feedback_for_button = show_copy_feedback.clone();
     btn_copy.connect_clicked(move |_| {
         if let (Some(entry), Some(window)) = (
@@ -817,16 +808,16 @@ fn build_ui(app: &Application) {
             window_weak_for_copy.upgrade(),
         ) {
             let text = entry.text().to_string();
-            if window_is_active(&window) {
-                copy_to_clipboard(&window, &text);
-                println!("{}", strings_for_copy.clipboard_log(&text));
-                show_copy_feedback_for_button();
-                pending_copy_for_button.borrow_mut().take();
-            } else {
-                // Defer copying until the window gains focus (needed on Wayland)
-                *pending_copy_for_button.borrow_mut() = Some(text.clone());
+            if !window_is_active(&window) {
                 window.present();
             }
+            schedule_auto_copy(
+                &window,
+                copy_state_for_button.clone(),
+                show_copy_feedback_for_button.clone(),
+                strings_for_copy.clone(),
+                text,
+            );
         }
     });
 
@@ -857,7 +848,7 @@ fn build_ui(app: &Application) {
     let settings_for_copy_toggle = settings.clone();
     let entry_weak_for_toggle = entry.downgrade();
     let window_weak_for_toggle = window.downgrade();
-    let pending_copy_for_toggle = pending_copy.clone();
+    let copy_state_for_toggle = copy_state.clone();
     let strings_for_copy_toggle = strings.clone();
     let show_copy_feedback_for_toggle = show_copy_feedback.clone();
     chk_copy_immediately.connect_toggled(move |chk| {
@@ -871,17 +862,16 @@ fn build_ui(app: &Application) {
                 window_weak_for_toggle.upgrade(),
             ) {
                 let text = entry.text().to_string();
-                if window_is_active(&window) {
-                    copy_to_clipboard(&window, &text);
-                    println!("{}", strings_for_copy_toggle.clipboard_log(&text));
-                    show_copy_feedback_for_toggle();
-                    pending_copy_for_toggle.borrow_mut().take();
-                } else {
-                    *pending_copy_for_toggle.borrow_mut() = Some(text);
-                }
+                schedule_auto_copy(
+                    &window,
+                    copy_state_for_toggle.clone(),
+                    show_copy_feedback_for_toggle.clone(),
+                    strings_for_copy_toggle.clone(),
+                    text,
+                );
             }
         } else {
-            pending_copy_for_toggle.borrow_mut().take();
+            copy_state_for_toggle.cancel();
         }
     });
 
@@ -904,6 +894,7 @@ fn build_ui(app: &Application) {
     let remaining = remaining.clone();
     let runtime_auto_close_active = runtime_auto_close_active.clone();
     let strings_for_timer = strings.clone();
+    let copy_state_for_timer = copy_state.clone();
 
     glib::timeout_add_seconds_local(1, move || {
         let window = match window_weak.upgrade() {
@@ -928,6 +919,14 @@ fn build_ui(app: &Application) {
             return glib::ControlFlow::Continue;
         }
 
+        // Never close before a pending clipboard copy has completed
+        // (e.g. window has not received focus yet on Wayland).
+        if copy_state_for_timer.pending.borrow().is_some() {
+            *remaining.borrow_mut() = CLOSE_AFTER_SEC;
+            lbl_timer.set_label("");
+            return glib::ControlFlow::Continue;
+        }
+
         let mut r = remaining.borrow_mut();
         *r -= 1;
         lbl_timer.set_label(&strings_for_timer.timer_label(*r));
@@ -940,25 +939,31 @@ fn build_ui(app: &Application) {
         glib::ControlFlow::Continue
     });
 
-    // Register is-active handler BEFORE present() to catch focus changes
-    let pending_copy_for_notify = pending_copy.clone();
-    let strings_for_notify = strings.clone();
-    let show_copy_feedback_for_notify = show_copy_feedback.clone();
-    window.connect_notify_local(Some("is-active"), move |win: &ApplicationWindow, _| {
-        if window_is_active(win) {
-            if let Some(text) = pending_copy_for_notify.borrow_mut().take() {
-                // Defer clipboard write to allow Wayland to fully process focus
-                let win = win.clone();
-                let strings = strings_for_notify.clone();
-                let show_feedback = show_copy_feedback_for_notify.clone();
-                glib::timeout_add_local_once(Duration::from_millis(50), move || {
-                    copy_to_clipboard(&win, &text);
-                    println!("{}", strings.clipboard_log(&text));
-                    show_feedback();
-                });
-            }
+    // Track real keyboard focus and copy the moment it arrives: right after
+    // the keyboard-enter event the Wayland input serial is fresh, so the
+    // clipboard write is guaranteed to be accepted. Registered BEFORE
+    // present() so the initial focus is never missed.
+    let focus_controller = gtk::EventControllerFocus::new();
+    let copy_state_for_focus = copy_state.clone();
+    let window_weak_for_focus = window.downgrade();
+    let strings_for_focus = strings.clone();
+    let show_copy_feedback_for_focus = show_copy_feedback.clone();
+    focus_controller.connect_enter(move |_| {
+        copy_state_for_focus.keyboard_focus.set(true);
+        if let Some(window) = window_weak_for_focus.upgrade() {
+            try_pending_copy(
+                &window,
+                &copy_state_for_focus,
+                &show_copy_feedback_for_focus,
+                &strings_for_focus,
+            );
         }
     });
+    let copy_state_for_blur = copy_state.clone();
+    focus_controller.connect_leave(move |_| {
+        copy_state_for_blur.keyboard_focus.set(false);
+    });
+    window.add_controller(focus_controller);
 
     window.present();
 
@@ -967,30 +972,6 @@ fn build_ui(app: &Application) {
     let settings_for_idle = settings.clone();
     glib::idle_add_local_once(move || {
         update_password_for_idle(settings_for_idle.borrow().groups);
-    });
-
-    // Fallback: if window was already active when handler registered, notification won't fire
-    let pending_copy_for_fallback = pending_copy.clone();
-    let window_for_fallback = window.clone();
-    let strings_for_fallback = strings.clone();
-    let show_copy_feedback_for_fallback = show_copy_feedback.clone();
-    glib::timeout_add_local_once(Duration::from_millis(250), move || {
-        if let Some(text) = pending_copy_for_fallback.borrow_mut().take() {
-            if window_is_active(&window_for_fallback) {
-                // Defer clipboard write to allow Wayland to fully process focus
-                let win = window_for_fallback.clone();
-                let strings = strings_for_fallback.clone();
-                let show_feedback = show_copy_feedback_for_fallback.clone();
-                glib::timeout_add_local_once(Duration::from_millis(50), move || {
-                    copy_to_clipboard(&win, &text);
-                    println!("{}", strings.clipboard_log(&text));
-                    show_feedback();
-                });
-            } else {
-                // Window still not active - restore for notification handler
-                *pending_copy_for_fallback.borrow_mut() = Some(text);
-            }
-        }
     });
 }
 
@@ -1057,6 +1038,169 @@ fn copy_to_clipboard(window: &ApplicationWindow, text: &str) {
     clipboard.set_text(text);
 }
 
+const DC_PENDING: u8 = 0;
+const DC_OK: u8 = 1;
+const DC_ERR: u8 = 2;
+
+// Copy via the Wayland data-control protocol (ext-data-control-v1 /
+// wlr-data-control), the same mechanism wl-copy uses. Unlike the GTK
+// clipboard this does not require keyboard focus, so it works right at
+// startup before the user has interacted with the window. The spawned
+// thread keeps serving paste requests until the selection is replaced;
+// on GNOME the compositor caches the content immediately, so it also
+// survives the app quitting.
+fn spawn_data_control_copy(text: String) -> Arc<AtomicU8> {
+    let state = Arc::new(AtomicU8::new(DC_PENDING));
+    let state_for_thread = state.clone();
+    std::thread::spawn(move || {
+        use wl_clipboard_rs::copy::{MimeType, Options, Source};
+        let mut options = Options::new();
+        // prepare_copy requires foreground mode; we serve from this thread.
+        options.foreground(true);
+        let result =
+            options.prepare_copy(Source::Bytes(text.into_bytes().into()), MimeType::Text);
+        match result {
+            Ok(prepared) => {
+                state_for_thread.store(DC_OK, Ordering::SeqCst);
+                if let Err(e) = prepared.serve() {
+                    eprintln!("data-control serve failed: {e:?}");
+                }
+            }
+            Err(e) => {
+                eprintln!("data-control copy unavailable: {e:?}");
+                state_for_thread.store(DC_ERR, Ordering::SeqCst);
+            }
+        }
+    });
+    state
+}
+
 fn window_is_active(window: &ApplicationWindow) -> bool {
     window.upcast_ref::<gtk::Window>().is_active()
+}
+
+// Shared state for one auto-copy request.
+struct CopyState {
+    pending: RefCell<Option<String>>,
+    dc_state: RefCell<Option<Arc<AtomicU8>>>,
+    gen: Cell<u64>,
+    feedback_shown: Cell<bool>,
+    // True while the window holds real keyboard focus (EventControllerFocus
+    // enter/leave). Unlike the is-active property this only turns true after
+    // GDK processed the keyboard-enter event, which is when a valid Wayland
+    // input serial for clipboard writes is guaranteed to exist.
+    keyboard_focus: Cell<bool>,
+}
+
+impl CopyState {
+    fn new() -> Rc<Self> {
+        Rc::new(CopyState {
+            pending: RefCell::new(None),
+            dc_state: RefCell::new(None),
+            gen: Cell::new(0),
+            feedback_shown: Cell::new(false),
+            keyboard_focus: Cell::new(false),
+        })
+    }
+
+    fn cancel(&self) {
+        self.gen.set(self.gen.get().wrapping_add(1));
+        self.feedback_shown.set(false);
+        self.pending.borrow_mut().take();
+        self.dc_state.borrow_mut().take();
+    }
+}
+
+// Try to complete a pending clipboard copy.
+//
+// Preferred path: the Wayland data-control copy running in a background
+// thread (no focus needed). Fallback: the GTK clipboard, which on Wayland
+// only takes effect while the window has keyboard focus (the compositor
+// validates the input-event serial), so it is gated on the window being
+// active. Returns true once the copy is done.
+fn try_pending_copy(
+    window: &ApplicationWindow,
+    copy_state: &Rc<CopyState>,
+    show_feedback: &Rc<dyn Fn()>,
+    strings: &Rc<I18nStrings>,
+) -> bool {
+    if copy_state.pending.borrow().is_none() {
+        return false;
+    }
+
+    let dc = copy_state
+        .dc_state
+        .borrow()
+        .as_ref()
+        .map(|s| s.load(Ordering::SeqCst))
+        .unwrap_or(DC_ERR);
+
+    match dc {
+        DC_OK => {}
+        // Data-control result not in yet; the retry timer checks again.
+        DC_PENDING => return false,
+        // No data-control support: fall back to the GTK clipboard, which
+        // needs real keyboard focus for the write to be accepted.
+        _ => {
+            if !copy_state.keyboard_focus.get() {
+                return false;
+            }
+        }
+    }
+
+    let text = match copy_state.pending.borrow_mut().take() {
+        Some(t) => t,
+        None => return false,
+    };
+    if dc != DC_OK {
+        copy_to_clipboard(window, &text);
+    }
+    println!("{}", strings.clipboard_log(&text));
+    if !copy_state.feedback_shown.get() {
+        show_feedback();
+        copy_state.feedback_shown.set(true);
+    }
+    true
+}
+
+fn schedule_auto_copy(
+    window: &ApplicationWindow,
+    copy_state: Rc<CopyState>,
+    show_feedback: Rc<dyn Fn()>,
+    strings: Rc<I18nStrings>,
+    text: String,
+) {
+    let gen = copy_state.gen.get().wrapping_add(1);
+    copy_state.gen.set(gen);
+    copy_state.feedback_shown.set(false);
+    *copy_state.pending.borrow_mut() = Some(text.clone());
+    *copy_state.dc_state.borrow_mut() = Some(spawn_data_control_copy(text));
+
+    if try_pending_copy(window, &copy_state, &show_feedback, &strings) {
+        return;
+    }
+
+    // Poll until the data-control thread reports a result or the window
+    // gains focus (the notify::is-active handler also retries then). Give
+    // up after 5 seconds; a later focus change can still finish the copy.
+    let window_weak = window.downgrade();
+    let mut attempts = 0u32;
+    glib::timeout_add_local(Duration::from_millis(50), move || {
+        if copy_state.gen.get() != gen {
+            return glib::ControlFlow::Break;
+        }
+        let window = match window_weak.upgrade() {
+            Some(w) => w,
+            None => return glib::ControlFlow::Break,
+        };
+        if try_pending_copy(&window, &copy_state, &show_feedback, &strings) {
+            return glib::ControlFlow::Break;
+        }
+        attempts += 1;
+        if attempts >= 100 {
+            glib::ControlFlow::Break
+        } else {
+            glib::ControlFlow::Continue
+        }
+    });
 }
