@@ -163,6 +163,7 @@ const AVAILABLE_TRANSLATIONS: &[(&str, StringsFactory)] = &[
     ("it", strings_it),
     ("fr", strings_fr),
     ("en", strings_en),
+    ("uk", strings_uk),
 ];
 
 fn strings_en() -> I18nStrings {
@@ -302,6 +303,26 @@ fn strings_fr() -> I18nStrings {
         digits_label: "Chiffres",
         special_label: "Caractères spéciaux",
         clipboard_log_template: "Copié dans le presse-papiers : première '{first}', longueur {length}",
+    }
+}
+
+fn strings_uk() -> I18nStrings {
+    I18nStrings {
+        app_title: "Генератор паролів",
+        groups_tooltip: "Кількість груп символів (по 5 у кожній)",
+        generate_button: "Новий",
+        copy_button: "Копіювати",
+        auto_close_label: "Автозакриття",
+        copy_immediately_label: "Копіювати одразу",
+        default_strategy_label: "Типова стратегія",
+        timer_template: "{seconds} с до закриття",
+        copy_success_label: "Скопійовано",
+        charset_section_label: "Складові",
+        lowercase_label: "Малі літери",
+        uppercase_label: "Великі літери",
+        digits_label: "Цифри",
+        special_label: "Спецсимволи",
+        clipboard_log_template: "Скопійовано в буфер: перший символ '{first}', довжина {length}",
     }
 }
 
