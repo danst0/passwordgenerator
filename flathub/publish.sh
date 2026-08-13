@@ -48,8 +48,10 @@ if ! git rev-parse "${TAG}" &>/dev/null; then
     fi
 fi
 
-# Get commit for tag
-TAG_COMMIT=$(git rev-parse "${TAG}")
+# Get commit for tag. The ^{commit} peel is required: for an annotated tag
+# plain rev-parse returns the tag object's SHA, which is not what the
+# manifest's commit field means.
+TAG_COMMIT=$(git rev-parse "${TAG}^{commit}")
 echo "Tag commit: ${TAG_COMMIT}"
 
 # Update local manifest with new tag/commit
