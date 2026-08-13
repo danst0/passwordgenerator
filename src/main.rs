@@ -121,7 +121,6 @@ struct I18nStrings {
     uppercase_label: &'static str,
     digits_label: &'static str,
     special_label: &'static str,
-    clipboard_log_template: &'static str,
     chars_unit: &'static str,
     entropy_label: &'static str,
     bits_unit: &'static str,
@@ -139,14 +138,6 @@ impl I18nStrings {
     fn timer_label(&self, seconds: i32) -> String {
         self.timer_template
             .replace("{seconds}", &seconds.to_string())
-    }
-
-    fn clipboard_log(&self, password: &str) -> String {
-        let first = password.chars().next().unwrap_or('?');
-        let length = password.chars().count();
-        self.clipboard_log_template
-            .replace("{first}", &first.to_string())
-            .replace("{length}", &length.to_string())
     }
 
     /// Multi-line tooltip describing the strength of the password on screen.
@@ -279,7 +270,6 @@ fn strings_en() -> I18nStrings {
         uppercase_label: "Uppercase",
         digits_label: "Digits",
         special_label: "Special",
-        clipboard_log_template: "Copied to clipboard: first '{first}', length {length}",
         chars_unit: "characters",
         entropy_label: "Entropy",
         bits_unit: "bits",
@@ -308,7 +298,6 @@ fn strings_de() -> I18nStrings {
         uppercase_label: "Großbuchstaben",
         digits_label: "Ziffern",
         special_label: "Sonderzeichen",
-        clipboard_log_template: "In Zwischenablage kopiert: erster Buchstabe '{first}', Länge {length}",
         chars_unit: "Zeichen",
         entropy_label: "Entropie",
         bits_unit: "Bit",
@@ -343,7 +332,6 @@ fn strings_ja() -> I18nStrings {
         uppercase_label: "大文字",
         digits_label: "数字",
         special_label: "記号",
-        clipboard_log_template: "クリップボードにコピー: 先頭 '{first}', 長さ {length}",
         chars_unit: "文字",
         entropy_label: "エントロピー",
         bits_unit: "ビット",
@@ -372,7 +360,6 @@ fn strings_sv() -> I18nStrings {
         uppercase_label: "Versaler",
         digits_label: "Siffror",
         special_label: "Specialtecken",
-        clipboard_log_template: "Kopierat till urklipp: första '{first}', längd {length}",
         chars_unit: "tecken",
         entropy_label: "Entropi",
         bits_unit: "bitar",
@@ -407,7 +394,6 @@ fn strings_es() -> I18nStrings {
         uppercase_label: "Mayúsculas",
         digits_label: "Dígitos",
         special_label: "Caracteres especiales",
-        clipboard_log_template: "Copiado al portapapeles: primera '{first}', longitud {length}",
         chars_unit: "caracteres",
         entropy_label: "Entropía",
         bits_unit: "bits",
@@ -436,7 +422,6 @@ fn strings_it() -> I18nStrings {
         uppercase_label: "Maiuscole",
         digits_label: "Numeri",
         special_label: "Caratteri speciali",
-        clipboard_log_template: "Copiato negli appunti: prima '{first}', lunghezza {length}",
         chars_unit: "caratteri",
         entropy_label: "Entropia",
         bits_unit: "bit",
@@ -471,7 +456,6 @@ fn strings_fr() -> I18nStrings {
         uppercase_label: "Majuscules",
         digits_label: "Chiffres",
         special_label: "Caractères spéciaux",
-        clipboard_log_template: "Copié dans le presse-papiers : première '{first}', longueur {length}",
         chars_unit: "caractères",
         entropy_label: "Entropie",
         bits_unit: "bits",
@@ -1168,7 +1152,6 @@ fn build_ui(app: &Application) {
                     &window,
                     copy_state.clone(),
                     show_copy_feedback.clone(),
-                    strings.clone(),
                     password.clone(),
                 );
             } else {
@@ -1191,7 +1174,6 @@ fn build_ui(app: &Application) {
 
     let entry_weak_for_copy = entry.downgrade();
     let window_weak_for_copy = window.downgrade();
-    let strings_for_copy = strings.clone();
     let copy_state_for_button = copy_state.clone();
     let show_copy_feedback_for_button = show_copy_feedback.clone();
     btn_copy.connect_clicked(move |_| {
@@ -1207,7 +1189,6 @@ fn build_ui(app: &Application) {
                 &window,
                 copy_state_for_button.clone(),
                 show_copy_feedback_for_button.clone(),
-                strings_for_copy.clone(),
                 text,
             );
         }
@@ -1241,7 +1222,6 @@ fn build_ui(app: &Application) {
     let entry_weak_for_toggle = entry.downgrade();
     let window_weak_for_toggle = window.downgrade();
     let copy_state_for_toggle = copy_state.clone();
-    let strings_for_copy_toggle = strings.clone();
     let show_copy_feedback_for_toggle = show_copy_feedback.clone();
     chk_copy_immediately.connect_toggled(move |chk| {
         let is_active = chk.is_active();
@@ -1258,7 +1238,6 @@ fn build_ui(app: &Application) {
                     &window,
                     copy_state_for_toggle.clone(),
                     show_copy_feedback_for_toggle.clone(),
-                    strings_for_copy_toggle.clone(),
                     text,
                 );
             }
@@ -1338,7 +1317,6 @@ fn build_ui(app: &Application) {
     let focus_controller = gtk::EventControllerFocus::new();
     let copy_state_for_focus = copy_state.clone();
     let window_weak_for_focus = window.downgrade();
-    let strings_for_focus = strings.clone();
     let show_copy_feedback_for_focus = show_copy_feedback.clone();
     focus_controller.connect_enter(move |_| {
         copy_state_for_focus.keyboard_focus.set(true);
@@ -1347,7 +1325,6 @@ fn build_ui(app: &Application) {
                 &window,
                 &copy_state_for_focus,
                 &show_copy_feedback_for_focus,
-                &strings_for_focus,
             );
         }
     });
@@ -1607,7 +1584,6 @@ fn try_pending_copy(
     window: &ApplicationWindow,
     copy_state: &Rc<CopyState>,
     show_feedback: &Rc<dyn Fn()>,
-    strings: &Rc<I18nStrings>,
 ) -> bool {
     if copy_state.pending.borrow().is_none() {
         return false;
@@ -1640,7 +1616,6 @@ fn try_pending_copy(
     if dc != DC_OK {
         copy_to_clipboard(window, &text);
     }
-    println!("{}", strings.clipboard_log(&text));
     if !copy_state.feedback_shown.get() {
         show_feedback();
         copy_state.feedback_shown.set(true);
@@ -1652,7 +1627,6 @@ fn schedule_auto_copy(
     window: &ApplicationWindow,
     copy_state: Rc<CopyState>,
     show_feedback: Rc<dyn Fn()>,
-    strings: Rc<I18nStrings>,
     text: String,
 ) {
     let gen = copy_state.gen.get().wrapping_add(1);
@@ -1661,7 +1635,7 @@ fn schedule_auto_copy(
     *copy_state.pending.borrow_mut() = Some(text.clone());
     *copy_state.dc_state.borrow_mut() = Some(spawn_data_control_copy(text));
 
-    if try_pending_copy(window, &copy_state, &show_feedback, &strings) {
+    if try_pending_copy(window, &copy_state, &show_feedback) {
         return;
     }
 
@@ -1678,7 +1652,7 @@ fn schedule_auto_copy(
             Some(w) => w,
             None => return glib::ControlFlow::Break,
         };
-        if try_pending_copy(&window, &copy_state, &show_feedback, &strings) {
+        if try_pending_copy(&window, &copy_state, &show_feedback) {
             return glib::ControlFlow::Break;
         }
         attempts += 1;
