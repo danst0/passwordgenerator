@@ -17,13 +17,13 @@ done
 
 # Ensure required Flatpak runtimes are installed
 echo "Checking Flatpak runtimes..."
-if ! flatpak info org.gnome.Platform//49 &> /dev/null; then
-    echo "Installing org.gnome.Platform//49..."
-    flatpak install -y flathub org.gnome.Platform//49
+if ! flatpak info org.gnome.Platform//50 &> /dev/null; then
+    echo "Installing org.gnome.Platform//50..."
+    flatpak install -y flathub org.gnome.Platform//50
 fi
-if ! flatpak info org.gnome.Sdk//49 &> /dev/null; then
-    echo "Installing org.gnome.Sdk//49..."
-    flatpak install -y flathub org.gnome.Sdk//49
+if ! flatpak info org.gnome.Sdk//50 &> /dev/null; then
+    echo "Installing org.gnome.Sdk//50..."
+    flatpak install -y flathub org.gnome.Sdk//50
 fi
 if ! flatpak info org.freedesktop.Sdk.Extension.rust-stable//25.08 &> /dev/null; then
     echo "Installing org.freedesktop.Sdk.Extension.rust-stable//25.08..."
