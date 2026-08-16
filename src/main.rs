@@ -489,7 +489,7 @@ fn strings_uk() -> I18nStrings {
         entropy_label: "Ентропія",
         bits_unit: "біт",
         crack_time_label: "Офлайнова атака",
-        crack_time_note: "Припущення: 10¹² спроб/с (швидке гешування, потужний GPU)",
+        crack_time_note: "Припущення: 10¹² спроб/с (швидкий алгоритм, потужний ГП)",
         strength_labels: [
             "Дуже слабкий",
             "Слабкий",
