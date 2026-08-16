@@ -550,7 +550,7 @@ dependencies = [
 
 [[package]]
 name = "passwordgenerator"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "gio",
  "glib",
