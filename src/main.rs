@@ -252,6 +252,7 @@ const AVAILABLE_TRANSLATIONS: &[(&str, StringsFactory)] = &[
     ("it", strings_it),
     ("fr", strings_fr),
     ("en", strings_en),
+    ("uk", strings_uk),
 ];
 
 fn strings_en() -> I18nStrings {
@@ -464,6 +465,40 @@ fn strings_fr() -> I18nStrings {
         strength_labels: ["Très faible", "Faible", "Acceptable", "Fort", "Très fort"],
         time_units: ["s", "min", "h", "jours", "ans"],
         time_instant: "instantané",
+        decimal_separator: ",",
+    }
+}
+
+fn strings_uk() -> I18nStrings {
+    I18nStrings {
+        app_title: "Генератор паролів",
+        groups_tooltip: "Кількість груп символів (по 5 у кожній)",
+        generate_button: "Новий",
+        copy_button: "Копіювати",
+        auto_close_label: "Автозакриття",
+        copy_immediately_label: "Копіювати одразу",
+        default_strategy_label: "Типова стратегія",
+        timer_template: "{seconds} с до закриття",
+        copy_success_label: "Скопійовано",
+        charset_section_label: "Складові",
+        lowercase_label: "Малі літери",
+        uppercase_label: "Великі літери",
+        digits_label: "Цифри",
+        special_label: "Спецсимволи",
+        chars_unit: "символів",
+        entropy_label: "Ентропія",
+        bits_unit: "біт",
+        crack_time_label: "Офлайнова атака",
+        crack_time_note: "Припущення: 10¹² спроб/с (швидке гешування, потужний GPU)",
+        strength_labels: [
+            "Дуже слабкий",
+            "Слабкий",
+            "Прийнятний",
+            "Надійний",
+            "Дуже надійний",
+        ],
+        time_units: ["с", "хв", "год", "днів", "років"],
+        time_instant: "миттєво",
         decimal_separator: ",",
     }
 }
