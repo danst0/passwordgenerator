@@ -20,6 +20,10 @@ const LOWER: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
 const UPPER: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DIGITS: &[u8] = b"0123456789";
 const SPECIAL: &[u8] = b"!@#$%^&*";
+/// Reference rate for the time-to-crack estimate in the strength tooltip:
+/// an offline attack on a fast hash (MD5/NTLM class) with a high-end GPU.
+/// Named in the tooltip itself so the number is never presented unqualified.
+const GUESSES_PER_SECOND: f64 = 1e12;
 
 static COLOR_SCHEME_INIT: Once = Once::new();
 
@@ -117,7 +121,17 @@ struct I18nStrings {
     uppercase_label: &'static str,
     digits_label: &'static str,
     special_label: &'static str,
-    clipboard_log_template: &'static str,
+    chars_unit: &'static str,
+    entropy_label: &'static str,
+    bits_unit: &'static str,
+    crack_time_label: &'static str,
+    crack_time_note: &'static str,
+    /// Very weak, weak, reasonable, strong, very strong.
+    strength_labels: [&'static str; 5],
+    /// Seconds, minutes, hours, days, years.
+    time_units: [&'static str; 5],
+    time_instant: &'static str,
+    decimal_separator: &'static str,
 }
 
 impl I18nStrings {
@@ -126,12 +140,87 @@ impl I18nStrings {
             .replace("{seconds}", &seconds.to_string())
     }
 
-    fn clipboard_log(&self, password: &str) -> String {
-        let first = password.chars().next().unwrap_or('?');
-        let length = password.chars().count();
-        self.clipboard_log_template
-            .replace("{first}", &first.to_string())
-            .replace("{length}", &length.to_string())
+    /// Multi-line tooltip describing the strength of the password on screen.
+    fn strength_tooltip(&self, total_chars: usize, bits: f64) -> String {
+        format!(
+            "{} {} · {} {} {} · {}\n{}: {}\n{}",
+            total_chars,
+            self.chars_unit,
+            self.entropy_label,
+            self.format_number(bits, 1),
+            self.bits_unit,
+            self.strength_labels[strength_tier(bits)],
+            self.crack_time_label,
+            self.format_duration(crack_time_seconds(bits)),
+            self.crack_time_note,
+        )
+    }
+
+    fn format_number(&self, value: f64, decimals: usize) -> String {
+        let text = format!("{:.*}", decimals, value);
+        if self.decimal_separator == "." {
+            text
+        } else {
+            text.replace('.', self.decimal_separator)
+        }
+    }
+
+    /// Expected time-to-crack, scaled to a unit that stays readable across the
+    /// whole range (fractions of a second up to 10^70 years).
+    fn format_duration(&self, seconds: f64) -> String {
+        const MINUTE: f64 = 60.0;
+        const HOUR: f64 = 60.0 * MINUTE;
+        const DAY: f64 = 24.0 * HOUR;
+        const YEAR: f64 = 365.25 * DAY;
+
+        if seconds < 1.0 {
+            return self.time_instant.to_string();
+        }
+        if seconds < MINUTE {
+            return format!("{} {}", self.format_number(seconds, 0), self.time_units[0]);
+        }
+        if seconds < HOUR {
+            return format!(
+                "{} {}",
+                self.format_number(seconds / MINUTE, 0),
+                self.time_units[1]
+            );
+        }
+        if seconds < DAY {
+            return format!(
+                "{} {}",
+                self.format_number(seconds / HOUR, 0),
+                self.time_units[2]
+            );
+        }
+        if seconds < YEAR {
+            return format!(
+                "{} {}",
+                self.format_number(seconds / DAY, 1),
+                self.time_units[3]
+            );
+        }
+
+        let years = seconds / YEAR;
+        if years < 100.0 {
+            format!("{} {}", self.format_number(years, 1), self.time_units[4])
+        } else if years < 10_000.0 {
+            format!("{} {}", self.format_number(years, 0), self.time_units[4])
+        } else {
+            let mut exponent = years.log10().floor();
+            let mut mantissa = years / 10f64.powf(exponent);
+            // Keep the mantissa below 10 once rounded to one decimal.
+            if mantissa >= 9.95 {
+                exponent += 1.0;
+                mantissa = years / 10f64.powf(exponent);
+            }
+            format!(
+                "{} × 10{} {}",
+                self.format_number(mantissa, 1),
+                superscript(exponent as u32),
+                self.time_units[4]
+            )
+        }
     }
 }
 
@@ -182,7 +271,15 @@ fn strings_en() -> I18nStrings {
         uppercase_label: "Uppercase",
         digits_label: "Digits",
         special_label: "Special",
-        clipboard_log_template: "Copied to clipboard: first '{first}', length {length}",
+        chars_unit: "characters",
+        entropy_label: "Entropy",
+        bits_unit: "bits",
+        crack_time_label: "Offline attack",
+        crack_time_note: "Assumes 10¹² guesses/s (fast hash, high-end GPU)",
+        strength_labels: ["Very weak", "Weak", "Reasonable", "Strong", "Very strong"],
+        time_units: ["s", "min", "h", "days", "years"],
+        time_instant: "instantly",
+        decimal_separator: ".",
     }
 }
 
@@ -202,7 +299,21 @@ fn strings_de() -> I18nStrings {
         uppercase_label: "Großbuchstaben",
         digits_label: "Ziffern",
         special_label: "Sonderzeichen",
-        clipboard_log_template: "In Zwischenablage kopiert: erster Buchstabe '{first}', Länge {length}",
+        chars_unit: "Zeichen",
+        entropy_label: "Entropie",
+        bits_unit: "Bit",
+        crack_time_label: "Offline-Angriff",
+        crack_time_note: "Annahme: 10¹² Versuche/s (schneller Hash, High-End-GPU)",
+        strength_labels: [
+            "Sehr schwach",
+            "Schwach",
+            "Angemessen",
+            "Stark",
+            "Sehr stark",
+        ],
+        time_units: ["s", "Min.", "Std.", "Tage", "Jahre"],
+        time_instant: "sofort",
+        decimal_separator: ",",
     }
 }
 
@@ -222,7 +333,15 @@ fn strings_ja() -> I18nStrings {
         uppercase_label: "大文字",
         digits_label: "数字",
         special_label: "記号",
-        clipboard_log_template: "クリップボードにコピー: 先頭 '{first}', 長さ {length}",
+        chars_unit: "文字",
+        entropy_label: "エントロピー",
+        bits_unit: "ビット",
+        crack_time_label: "オフライン攻撃",
+        crack_time_note: "前提: 毎秒 10¹² 回の試行 (高速ハッシュ、ハイエンド GPU)",
+        strength_labels: ["非常に弱い", "弱い", "標準的", "強い", "非常に強い"],
+        time_units: ["秒", "分", "時間", "日", "年"],
+        time_instant: "即座に",
+        decimal_separator: ".",
     }
 }
 
@@ -242,7 +361,21 @@ fn strings_sv() -> I18nStrings {
         uppercase_label: "Versaler",
         digits_label: "Siffror",
         special_label: "Specialtecken",
-        clipboard_log_template: "Kopierat till urklipp: första '{first}', längd {length}",
+        chars_unit: "tecken",
+        entropy_label: "Entropi",
+        bits_unit: "bitar",
+        crack_time_label: "Offlineattack",
+        crack_time_note: "Antagande: 10¹² gissningar/s (snabb hash, high-end-GPU)",
+        strength_labels: [
+            "Mycket svagt",
+            "Svagt",
+            "Godtagbart",
+            "Starkt",
+            "Mycket starkt",
+        ],
+        time_units: ["s", "min", "h", "dagar", "år"],
+        time_instant: "omedelbart",
+        decimal_separator: ",",
     }
 }
 
@@ -262,7 +395,15 @@ fn strings_es() -> I18nStrings {
         uppercase_label: "Mayúsculas",
         digits_label: "Dígitos",
         special_label: "Caracteres especiales",
-        clipboard_log_template: "Copiado al portapapeles: primera '{first}', longitud {length}",
+        chars_unit: "caracteres",
+        entropy_label: "Entropía",
+        bits_unit: "bits",
+        crack_time_label: "Ataque offline",
+        crack_time_note: "Supone 10¹² intentos/s (hash rápido, GPU de gama alta)",
+        strength_labels: ["Muy débil", "Débil", "Aceptable", "Fuerte", "Muy fuerte"],
+        time_units: ["s", "min", "h", "días", "años"],
+        time_instant: "al instante",
+        decimal_separator: ",",
     }
 }
 
@@ -282,7 +423,21 @@ fn strings_it() -> I18nStrings {
         uppercase_label: "Maiuscole",
         digits_label: "Numeri",
         special_label: "Caratteri speciali",
-        clipboard_log_template: "Copiato negli appunti: prima '{first}', lunghezza {length}",
+        chars_unit: "caratteri",
+        entropy_label: "Entropia",
+        bits_unit: "bit",
+        crack_time_label: "Attacco offline",
+        crack_time_note: "Ipotesi: 10¹² tentativi/s (hash veloce, GPU di fascia alta)",
+        strength_labels: [
+            "Molto debole",
+            "Debole",
+            "Accettabile",
+            "Forte",
+            "Molto forte",
+        ],
+        time_units: ["s", "min", "h", "giorni", "anni"],
+        time_instant: "istantaneo",
+        decimal_separator: ",",
     }
 }
 
@@ -302,7 +457,15 @@ fn strings_fr() -> I18nStrings {
         uppercase_label: "Majuscules",
         digits_label: "Chiffres",
         special_label: "Caractères spéciaux",
-        clipboard_log_template: "Copié dans le presse-papiers : première '{first}', longueur {length}",
+        chars_unit: "caractères",
+        entropy_label: "Entropie",
+        bits_unit: "bits",
+        crack_time_label: "Attaque hors ligne",
+        crack_time_note: "Hypothèse : 10¹² essais/s (hachage rapide, GPU haut de gamme)",
+        strength_labels: ["Très faible", "Faible", "Acceptable", "Fort", "Très fort"],
+        time_units: ["s", "min", "h", "jours", "ans"],
+        time_instant: "instantané",
+        decimal_separator: ",",
     }
 }
 
@@ -342,7 +505,209 @@ mod tests {
                 "Missing strings for language code {}",
                 code
             );
+            assert!(
+                !strings.chars_unit.is_empty()
+                    && !strings.entropy_label.is_empty()
+                    && !strings.bits_unit.is_empty()
+                    && !strings.crack_time_label.is_empty()
+                    && !strings.crack_time_note.is_empty()
+                    && !strings.time_instant.is_empty()
+                    && strings.strength_labels.iter().all(|s| !s.is_empty())
+                    && strings.time_units.iter().all(|s| !s.is_empty()),
+                "Missing strength tooltip strings for language code {}",
+                code
+            );
+            assert!(
+                strings.decimal_separator == "." || strings.decimal_separator == ",",
+                "Unexpected decimal separator for language code {}",
+                code
+            );
         }
+    }
+
+    /// Does a password match the shape the default strategy always produces:
+    /// exactly one character from each enabled extra class, everything else
+    /// lowercase?
+    fn matches_default_shape(word: &[u8], options: &GenerationOptions) -> bool {
+        let occurrences = |set: &[u8]| word.iter().filter(|c| set.contains(c)).count();
+        let mut extras = 0;
+        for (enabled, set) in [
+            (options.uppercase, UPPER),
+            (options.digits, DIGITS),
+            (options.special, SPECIAL),
+        ] {
+            let found = occurrences(set);
+            if enabled {
+                if found != 1 {
+                    return false;
+                }
+                extras += 1;
+            } else if found != 0 {
+                return false;
+            }
+        }
+        occurrences(LOWER) == word.len() - extras
+    }
+
+    /// Count the reachable passwords by walking the whole search space, without
+    /// reusing any of the maths from `entropy_bits_for_length`.
+    fn count_reachable_by_enumeration(total_chars: usize, options: &GenerationOptions) -> u64 {
+        let mut alphabet: Vec<u8> = LOWER.to_vec();
+        if options.uppercase {
+            alphabet.extend_from_slice(UPPER);
+        }
+        if options.digits {
+            alphabet.extend_from_slice(DIGITS);
+        }
+        if options.special {
+            alphabet.extend_from_slice(SPECIAL);
+        }
+
+        let base = alphabet.len();
+        let mut indices = vec![0usize; total_chars];
+        let mut word = vec![0u8; total_chars];
+        let mut count = 0u64;
+        loop {
+            for (slot, &i) in word.iter_mut().zip(indices.iter()) {
+                *slot = alphabet[i];
+            }
+            if matches_default_shape(&word, options) {
+                count += 1;
+            }
+
+            let mut pos = 0;
+            while pos < total_chars {
+                indices[pos] += 1;
+                if indices[pos] < base {
+                    break;
+                }
+                indices[pos] = 0;
+                pos += 1;
+            }
+            if pos == total_chars {
+                return count;
+            }
+        }
+    }
+
+    #[test]
+    fn default_strategy_entropy_matches_enumerated_keyspace() {
+        // Two enabled extra classes: 62^3 candidates.
+        let two_classes = GenerationOptions::new(true, true, true, false);
+        // All three enabled, every position forced: 70^3 candidates.
+        let three_classes = GenerationOptions::new(true, true, true, true);
+
+        for options in [two_classes, three_classes] {
+            let expected = (count_reachable_by_enumeration(3, &options) as f64).log2();
+            let actual = entropy_bits_for_length(3, &options, true).expect("entropy available");
+            assert!(
+                (actual - expected).abs() < 1e-9,
+                "entropy {actual} does not match enumerated keyspace {expected}"
+            );
+        }
+    }
+
+    #[test]
+    fn generated_passwords_match_the_shape_the_entropy_assumes() {
+        let options = GenerationOptions::new(true, true, true, true);
+        for _ in 0..200 {
+            let password = generate_password(3, &options, true);
+            let word: Vec<u8> = password.bytes().filter(|b| *b != b'-').collect();
+            assert_eq!(word.len(), 15);
+            assert!(
+                matches_default_shape(&word, &options),
+                "unexpected password shape: {password}"
+            );
+        }
+    }
+
+    #[test]
+    fn custom_strategy_entropy_is_length_times_pool() {
+        let options = GenerationOptions::new(true, true, true, true);
+        let bits = password_entropy_bits(3, &options, false).expect("entropy available");
+        assert!((bits - 15.0 * 70f64.log2()).abs() < 1e-9);
+
+        let lowercase_only = GenerationOptions::new(true, false, false, false);
+        let bits = password_entropy_bits(1, &lowercase_only, false).expect("entropy available");
+        assert!((bits - 5.0 * 26f64.log2()).abs() < 1e-9);
+    }
+
+    #[test]
+    fn entropy_is_unavailable_without_any_character_set() {
+        let empty = GenerationOptions::new(false, false, false, false);
+        assert!(password_entropy_bits(3, &empty, false).is_none());
+    }
+
+    #[test]
+    fn default_strategy_is_weaker_than_the_naive_estimate() {
+        // The mostly-lowercase base makes the default strategy weaker than
+        // "length × log2(full pool)" would suggest — the tooltip must not
+        // overstate it.
+        let options = GenerationOptions::new(true, true, true, true);
+        let actual = password_entropy_bits(3, &options, true).expect("entropy available");
+        let naive = 15.0 * 70f64.log2();
+        assert!(actual < naive - 10.0, "default strategy entropy: {actual}");
+        assert!(actual > 15.0 * 26f64.log2());
+    }
+
+    #[test]
+    fn durations_scale_across_the_whole_range() {
+        let en = strings_en();
+        assert_eq!(en.format_duration(0.5), "instantly");
+        assert_eq!(en.format_duration(30.0), "30 s");
+        assert_eq!(en.format_duration(600.0), "10 min");
+        assert_eq!(en.format_duration(7200.0), "2 h");
+        assert_eq!(en.format_duration(3.0 * 86_400.0), "3.0 days");
+
+        // Large values fall back to scientific notation, which needs no
+        // translation, and the mantissa always stays below 10.
+        let huge = en.format_duration(crack_time_seconds(200.0));
+        assert!(huge.contains("× 10"), "unexpected duration: {huge}");
+        assert!(huge.ends_with("years"), "unexpected duration: {huge}");
+        for bits in 30..310 {
+            let text = en.format_duration(crack_time_seconds(bits as f64));
+            assert!(!text.contains("10.0 ×"), "bad mantissa at {bits} bits: {text}");
+            assert!(!text.contains("inf") && !text.contains("NaN"), "{text}");
+        }
+    }
+
+    #[test]
+    fn german_tooltip_uses_a_decimal_comma() {
+        let de = strings_de();
+        let options = GenerationOptions::new(true, true, true, true);
+        let bits = password_entropy_bits(3, &options, false).expect("entropy available");
+        let tooltip = de.strength_tooltip(15, bits);
+        assert!(tooltip.contains("91,9 Bit"), "unexpected tooltip: {tooltip}");
+        assert!(tooltip.contains("· Stark"), "unexpected tooltip: {tooltip}");
+        assert!(
+            tooltip.contains("7,5 × 10⁷ Jahre"),
+            "unexpected tooltip: {tooltip}"
+        );
+        assert_eq!(tooltip.lines().count(), 3);
+    }
+
+    #[test]
+    fn strength_tiers_cover_the_configurable_range() {
+        let all = GenerationOptions::new(true, true, true, true);
+        let lowercase_only = GenerationOptions::new(true, false, false, false);
+        // Weakest possible setting: one group of lowercase characters.
+        assert_eq!(
+            strength_tier(password_entropy_bits(1, &lowercase_only, false).unwrap()),
+            0
+        );
+        // Strongest: ten groups over the full pool.
+        assert_eq!(
+            strength_tier(password_entropy_bits(10, &all, false).unwrap()),
+            4
+        );
+    }
+
+    #[test]
+    fn superscript_renders_exponents() {
+        assert_eq!(superscript(0), "⁰");
+        assert_eq!(superscript(7), "⁷");
+        assert_eq!(superscript(72), "⁷²");
+        assert_eq!(superscript(104), "¹⁰⁴");
     }
 }
 
@@ -786,18 +1151,28 @@ fn build_ui(app: &Application) {
 
             if !use_default_strategy && !options.is_valid() {
                 entry.set_text("");
+                entry.set_tooltip_text(None);
                 return;
             }
 
             let password = generate_password(len, &options, use_default_strategy);
             entry.set_text(&password);
 
+            // Describe the password on screen in a tooltip, so the strength
+            // information costs no permanent screen real estate.
+            match password_entropy_bits(len, &options, use_default_strategy) {
+                Some(bits) if !password.is_empty() => {
+                    let total_chars = password.chars().filter(|c| *c != '-').count();
+                    entry.set_tooltip_text(Some(&strings.strength_tooltip(total_chars, bits)));
+                }
+                _ => entry.set_tooltip_text(None),
+            }
+
             if chk_copy_immediately.is_active() {
                 schedule_auto_copy(
                     &window,
                     copy_state.clone(),
                     show_copy_feedback.clone(),
-                    strings.clone(),
                     password.clone(),
                 );
             } else {
@@ -820,7 +1195,6 @@ fn build_ui(app: &Application) {
 
     let entry_weak_for_copy = entry.downgrade();
     let window_weak_for_copy = window.downgrade();
-    let strings_for_copy = strings.clone();
     let copy_state_for_button = copy_state.clone();
     let show_copy_feedback_for_button = show_copy_feedback.clone();
     btn_copy.connect_clicked(move |_| {
@@ -836,7 +1210,6 @@ fn build_ui(app: &Application) {
                 &window,
                 copy_state_for_button.clone(),
                 show_copy_feedback_for_button.clone(),
-                strings_for_copy.clone(),
                 text,
             );
         }
@@ -870,7 +1243,6 @@ fn build_ui(app: &Application) {
     let entry_weak_for_toggle = entry.downgrade();
     let window_weak_for_toggle = window.downgrade();
     let copy_state_for_toggle = copy_state.clone();
-    let strings_for_copy_toggle = strings.clone();
     let show_copy_feedback_for_toggle = show_copy_feedback.clone();
     chk_copy_immediately.connect_toggled(move |chk| {
         let is_active = chk.is_active();
@@ -887,7 +1259,6 @@ fn build_ui(app: &Application) {
                     &window,
                     copy_state_for_toggle.clone(),
                     show_copy_feedback_for_toggle.clone(),
-                    strings_for_copy_toggle.clone(),
                     text,
                 );
             }
@@ -967,7 +1338,6 @@ fn build_ui(app: &Application) {
     let focus_controller = gtk::EventControllerFocus::new();
     let copy_state_for_focus = copy_state.clone();
     let window_weak_for_focus = window.downgrade();
-    let strings_for_focus = strings.clone();
     let show_copy_feedback_for_focus = show_copy_feedback.clone();
     focus_controller.connect_enter(move |_| {
         copy_state_for_focus.keyboard_focus.set(true);
@@ -976,7 +1346,6 @@ fn build_ui(app: &Application) {
                 &window,
                 &copy_state_for_focus,
                 &show_copy_feedback_for_focus,
-                &strings_for_focus,
             );
         }
     });
@@ -994,6 +1363,99 @@ fn build_ui(app: &Application) {
     glib::idle_add_local_once(move || {
         update_password_for_idle(settings_for_idle.borrow().groups);
     });
+}
+
+fn strength_tier(bits: f64) -> usize {
+    match bits {
+        b if b < 40.0 => 0,
+        b if b < 60.0 => 1,
+        b if b < 80.0 => 2,
+        b if b < 100.0 => 3,
+        _ => 4,
+    }
+}
+
+/// Expected time to find the password by brute force: on average an attacker
+/// has to walk half the keyspace, so 2^(bits-1) guesses.
+fn crack_time_seconds(bits: f64) -> f64 {
+    (bits - 1.0).exp2() / GUESSES_PER_SECOND
+}
+
+fn superscript(mut n: u32) -> String {
+    const DIGITS_SUP: [char; 10] = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
+    if n == 0 {
+        return DIGITS_SUP[0].to_string();
+    }
+    let mut digits = Vec::new();
+    while n > 0 {
+        digits.push(DIGITS_SUP[(n % 10) as usize]);
+        n /= 10;
+    }
+    digits.reverse();
+    digits.into_iter().collect()
+}
+
+fn password_entropy_bits(
+    groups: i32,
+    options: &GenerationOptions,
+    use_default_strategy: bool,
+) -> Option<f64> {
+    entropy_bits_for_length((groups.max(1) * 5) as usize, options, use_default_strategy)
+}
+
+/// Exact Shannon entropy of the distribution `generate_password` draws from.
+///
+/// Both strategies produce a uniform distribution over their reachable
+/// passwords, so the entropy is `log2(number of reachable passwords)`.
+///
+/// For the default strategy that is *not* `length × log2(pool)`: the base is
+/// drawn from lowercase only, and one position per enabled extra character
+/// class is overwritten. Counting it properly (free lowercase positions, the
+/// ordered choice of positions to overwrite, and the forced characters
+/// themselves) gives a noticeably lower — and honest — figure.
+fn entropy_bits_for_length(
+    total_chars: usize,
+    options: &GenerationOptions,
+    use_default_strategy: bool,
+) -> Option<f64> {
+    if total_chars == 0 {
+        return None;
+    }
+
+    if use_default_strategy {
+        let forced: Vec<usize> = [
+            (options.uppercase, UPPER.len()),
+            (options.digits, DIGITS.len()),
+            (options.special, SPECIAL.len()),
+        ]
+        .into_iter()
+        .filter(|(enabled, _)| *enabled)
+        .map(|(_, size)| size)
+        .collect();
+
+        if forced.len() > total_chars {
+            return None;
+        }
+
+        // Positions left untouched, each a uniform lowercase character.
+        let mut bits = (total_chars - forced.len()) as f64 * (LOWER.len() as f64).log2();
+        // Ordered choice of the distinct positions that get overwritten:
+        // total × (total-1) × … × (total-forced+1) possibilities.
+        for i in 0..forced.len() {
+            bits += ((total_chars - i) as f64).log2();
+        }
+        // The forced characters themselves.
+        for size in forced {
+            bits += (size as f64).log2();
+        }
+        Some(bits)
+    } else {
+        let pool = options.pool().len();
+        if pool == 0 {
+            return None;
+        }
+        Some(total_chars as f64 * (pool as f64).log2())
+    }
 }
 
 fn generate_password(groups: i32, options: &GenerationOptions, use_default_strategy: bool) -> String {
@@ -1143,7 +1605,6 @@ fn try_pending_copy(
     window: &ApplicationWindow,
     copy_state: &Rc<CopyState>,
     show_feedback: &Rc<dyn Fn()>,
-    strings: &Rc<I18nStrings>,
 ) -> bool {
     if copy_state.pending.borrow().is_none() {
         return false;
@@ -1176,7 +1637,6 @@ fn try_pending_copy(
     if dc != DC_OK {
         copy_to_clipboard(window, &text);
     }
-    println!("{}", strings.clipboard_log(&text));
     if !copy_state.feedback_shown.get() {
         show_feedback();
         copy_state.feedback_shown.set(true);
@@ -1188,7 +1648,6 @@ fn schedule_auto_copy(
     window: &ApplicationWindow,
     copy_state: Rc<CopyState>,
     show_feedback: Rc<dyn Fn()>,
-    strings: Rc<I18nStrings>,
     text: String,
 ) {
     let gen = copy_state.gen.get().wrapping_add(1);
@@ -1197,7 +1656,7 @@ fn schedule_auto_copy(
     *copy_state.pending.borrow_mut() = Some(text.clone());
     *copy_state.dc_state.borrow_mut() = Some(spawn_data_control_copy(text));
 
-    if try_pending_copy(window, &copy_state, &show_feedback, &strings) {
+    if try_pending_copy(window, &copy_state, &show_feedback) {
         return;
     }
 
@@ -1214,7 +1673,7 @@ fn schedule_auto_copy(
             Some(w) => w,
             None => return glib::ControlFlow::Break,
         };
-        if try_pending_copy(&window, &copy_state, &show_feedback, &strings) {
+        if try_pending_copy(&window, &copy_state, &show_feedback) {
             return glib::ControlFlow::Break;
         }
         attempts += 1;
