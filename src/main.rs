@@ -485,7 +485,21 @@ fn strings_uk() -> I18nStrings {
         uppercase_label: "Великі літери",
         digits_label: "Цифри",
         special_label: "Спецсимволи",
-        clipboard_log_template: "Скопійовано в буфер: перший символ '{first}', довжина {length}",
+        chars_unit: "символів",
+        entropy_label: "Ентропія",
+        bits_unit: "біт",
+        crack_time_label: "Офлайнова атака",
+        crack_time_note: "Припущення: 10¹² спроб/с (швидке гешування, потужний GPU)",
+        strength_labels: [
+            "Дуже слабкий",
+            "Слабкий",
+            "Прийнятний",
+            "Надійний",
+            "Дуже надійний",
+        ],
+        time_units: ["с", "хв", "год", "днів", "років"],
+        time_instant: "миттєво",
+        decimal_separator: ",",
     }
 }
 
