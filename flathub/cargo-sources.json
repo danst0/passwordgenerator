@@ -93,6 +93,19 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
+        "url": "https://static.crates.io/crates/dlib/dlib-0.5.3.crate",
+        "sha256": "ab8ecd87370524b461f8557c119c405552c396ed91fc0a8eec68679eab26f94a",
+        "dest": "cargo/vendor/dlib-0.5.3"
+    },
+    {
+        "type": "inline",
+        "contents": "{\"package\": \"ab8ecd87370524b461f8557c119c405552c396ed91fc0a8eec68679eab26f94a\", \"files\": {}}",
+        "dest": "cargo/vendor/dlib-0.5.3",
+        "dest-filename": ".cargo-checksum.json"
+    },
+    {
+        "type": "archive",
+        "archive-type": "tar-gzip",
         "url": "https://static.crates.io/crates/downcast-rs/downcast-rs-1.2.1.crate",
         "sha256": "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2",
         "dest": "cargo/vendor/downcast-rs-1.2.1"
@@ -322,6 +335,32 @@
         "type": "inline",
         "contents": "{\"package\": \"6f6eb95798e2b46f279cf59005daf297d5b69555428f185650d71974a910473a\", \"files\": {}}",
         "dest": "cargo/vendor/gdk4-sys-0.9.6",
+        "dest-filename": ".cargo-checksum.json"
+    },
+    {
+        "type": "archive",
+        "archive-type": "tar-gzip",
+        "url": "https://static.crates.io/crates/gdk4-wayland/gdk4-wayland-0.9.6.crate",
+        "sha256": "bd34518488cd624a85e75e82540bc24c72cfeb0aea6bad7faed683ca3977dba0",
+        "dest": "cargo/vendor/gdk4-wayland-0.9.6"
+    },
+    {
+        "type": "inline",
+        "contents": "{\"package\": \"bd34518488cd624a85e75e82540bc24c72cfeb0aea6bad7faed683ca3977dba0\", \"files\": {}}",
+        "dest": "cargo/vendor/gdk4-wayland-0.9.6",
+        "dest-filename": ".cargo-checksum.json"
+    },
+    {
+        "type": "archive",
+        "archive-type": "tar-gzip",
+        "url": "https://static.crates.io/crates/gdk4-wayland-sys/gdk4-wayland-sys-0.9.6.crate",
+        "sha256": "7c7a0f2332c531d62ee3f14f5e839ac1abac59e9b052adf1495124c00d89a34b",
+        "dest": "cargo/vendor/gdk4-wayland-sys-0.9.6"
+    },
+    {
+        "type": "inline",
+        "contents": "{\"package\": \"7c7a0f2332c531d62ee3f14f5e839ac1abac59e9b052adf1495124c00d89a34b\", \"files\": {}}",
+        "dest": "cargo/vendor/gdk4-wayland-sys-0.9.6",
         "dest-filename": ".cargo-checksum.json"
     },
     {
@@ -582,6 +621,19 @@
         "type": "inline",
         "contents": "{\"package\": \"68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66\", \"files\": {}}",
         "dest": "cargo/vendor/libc-0.2.186",
+        "dest-filename": ".cargo-checksum.json"
+    },
+    {
+        "type": "archive",
+        "archive-type": "tar-gzip",
+        "url": "https://static.crates.io/crates/libloading/libloading-0.8.9.crate",
+        "sha256": "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55",
+        "dest": "cargo/vendor/libloading-0.8.9"
+    },
+    {
+        "type": "inline",
+        "contents": "{\"package\": \"d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55\", \"files\": {}}",
+        "dest": "cargo/vendor/libloading-0.8.9",
         "dest-filename": ".cargo-checksum.json"
     },
     {
@@ -881,6 +933,19 @@
         "type": "inline",
         "contents": "{\"package\": \"62049b2877bf12821e8f9ad256ee38fdc31db7387ec2d3b3f403024de2034aea\", \"files\": {}}",
         "dest": "cargo/vendor/ryu-1.0.21",
+        "dest-filename": ".cargo-checksum.json"
+    },
+    {
+        "type": "archive",
+        "archive-type": "tar-gzip",
+        "url": "https://static.crates.io/crates/scoped-tls/scoped-tls-1.0.1.crate",
+        "sha256": "e1cf6437eb19a8f4a6cc0f7dca544973b0b78843adbfeb3683d1a94a0024a294",
+        "dest": "cargo/vendor/scoped-tls-1.0.1"
+    },
+    {
+        "type": "inline",
+        "contents": "{\"package\": \"e1cf6437eb19a8f4a6cc0f7dca544973b0b78843adbfeb3683d1a94a0024a294\", \"files\": {}}",
+        "dest": "cargo/vendor/scoped-tls-1.0.1",
         "dest-filename": ".cargo-checksum.json"
     },
     {
@@ -1258,6 +1323,19 @@
         "type": "inline",
         "contents": "{\"package\": \"d8eab23fefc9e41f8e841df4a9c707e8a8c4ed26e944ef69297184de2785e3be\", \"files\": {}}",
         "dest": "cargo/vendor/wayland-sys-0.31.11",
+        "dest-filename": ".cargo-checksum.json"
+    },
+    {
+        "type": "archive",
+        "archive-type": "tar-gzip",
+        "url": "https://static.crates.io/crates/windows-link/windows-link-0.2.1.crate",
+        "sha256": "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5",
+        "dest": "cargo/vendor/windows-link-0.2.1"
+    },
+    {
+        "type": "inline",
+        "contents": "{\"package\": \"f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5\", \"files\": {}}",
+        "dest": "cargo/vendor/windows-link-0.2.1",
         "dest-filename": ".cargo-checksum.json"
     },
     {

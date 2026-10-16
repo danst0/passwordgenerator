@@ -1,6 +1,8 @@
+mod wayland_selection;
+
 use gtk4 as gtk;
 use gtk::prelude::*;
-use gtk::{Adjustment, Application, ApplicationWindow, Button, CheckButton, CssProvider, Entry, FlowBox, GestureClick, Label, Orientation, PropagationPhase, Revealer, RevealerTransitionType, SelectionMode, SpinButton};
+use gtk::{Adjustment, Application, ApplicationWindow, Button, CheckButton, CssProvider, Entry, GestureClick, Label, Orientation, PropagationPhase, SpinButton};
 use gio::{Settings, SettingsSchemaSource, SimpleAction};
 use rand::{seq::SliceRandom, Rng, rngs::OsRng};
 use std::cell::{Cell, RefCell};
@@ -12,6 +14,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use std::time::Duration;
+use wayland_selection::WaylandSelection;
 
 const APP_ID: &str = "io.github.danst0.passwordgenerator";
 const DEFAULT_GROUPS: i32 = 3;
@@ -770,23 +773,66 @@ fn install_custom_css(window: &ApplicationWindow) {
     );
 
     let css = r#"
-        entry.password-entry {
-            border-radius: 10px;
-            padding: 6px 12px;
+        .card {
+            background-color: alpha(currentColor, 0.05);
+            border: 1px solid alpha(currentColor, 0.10);
+            border-radius: 12px;
         }
 
-        .copy-feedback-box {
-            margin-top: -4px;
+        .password-card {
+            padding: 18px 16px 12px 16px;
         }
 
-        .copy-feedback-label,
-        .copy-feedback-icon {
-            color: @theme_selected_bg_color;
+        entry.password-entry,
+        entry.password-entry:focus-within {
+            background: none;
+            border: none;
+            box-shadow: none;
+            outline: none;
+            min-height: 44px;
+            font-family: monospace;
+            font-size: 22px;
             font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .options-card {
+            padding: 8px 10px;
+        }
+
+        .section-heading {
+            font-weight: bold;
+            font-size: 0.9em;
+            opacity: 0.75;
+            margin-left: 4px;
+        }
+
+        button.copied {
+            transition: none;
+        }
+
+        .timer-label {
+            font-feature-settings: "tnum";
         }
         "#;
 
     let _ = provider.load_from_data(css);
+}
+
+/// Button showing a symbolic icon next to its label. Returns the parts so
+/// the copy button can swap them for its "copied" feedback.
+fn icon_label_button(icon_name: &str, label: &str) -> (Button, gtk::Image, Label) {
+    let icon = gtk::Image::from_icon_name(icon_name);
+    let text = Label::new(Some(label));
+    let content = gtk::Box::builder()
+        .orientation(Orientation::Horizontal)
+        .spacing(6)
+        .halign(gtk::Align::Center)
+        .build();
+    content.append(&icon);
+    content.append(&text);
+    let button = Button::builder().child(&content).valign(gtk::Align::Center).build();
+    (button, icon, text)
 }
 
 fn get_config_path() -> PathBuf {
@@ -859,8 +905,8 @@ fn build_ui(app: &Application) {
     let window = ApplicationWindow::builder()
         .application(app)
         .title(strings.app_title)
-        .default_width(420)
-        .default_height(320)
+        .default_width(460)
+        .default_height(-1)
         .build();
 
     let window_weak = window.downgrade();
@@ -875,99 +921,103 @@ fn build_ui(app: &Application) {
 
     install_custom_css(&window);
 
+    let header = gtk::HeaderBar::new();
+    let lbl_timer = Label::new(None);
+    lbl_timer.add_css_class("dim-label");
+    lbl_timer.add_css_class("timer-label");
+    header.pack_end(&lbl_timer);
+    window.set_titlebar(Some(&header));
+
     let box_container = gtk::Box::builder()
         .orientation(Orientation::Vertical)
-        .spacing(15)
-        .margin_top(20)
-        .margin_bottom(20)
-        .margin_start(20)
-        .margin_end(20)
+        .spacing(18)
+        .margin_top(18)
+        .margin_bottom(18)
+        .margin_start(18)
+        .margin_end(18)
         .build();
 
     window.set_child(Some(&box_container));
 
+    // Password card: the password itself plus everything that acts on it.
+    let password_card = gtk::Box::builder()
+        .orientation(Orientation::Vertical)
+        .spacing(14)
+        .css_classes(vec!["card".to_string(), "password-card".to_string()])
+        .build();
+    box_container.append(&password_card);
+
     let entry = Entry::builder()
         .editable(false)
-        .css_classes(vec!["title-3".to_string(), "password-entry".to_string()])
+        .can_focus(false)
+        .hexpand(true)
+        .css_classes(vec!["password-entry".to_string()])
         .build();
     gtk::prelude::EntryExt::set_alignment(&entry, 0.5);
-    box_container.append(&entry);
+    password_card.append(&entry);
 
     let controls_box = gtk::Box::builder()
         .orientation(Orientation::Horizontal)
-        .spacing(10)
-        .halign(gtk::Align::Center)
+        .spacing(8)
         .build();
-    box_container.append(&controls_box);
+    password_card.append(&controls_box);
 
     let adjustment = Adjustment::new(settings.borrow().groups as f64, 1.0, 10.0, 1.0, 1.0, 0.0);
     let spin_len = SpinButton::new(Some(&adjustment), 1.0, 0);
     spin_len.set_tooltip_text(Some(strings.groups_tooltip));
+    spin_len.set_valign(gtk::Align::Center);
     controls_box.append(&spin_len);
 
-    let btn_gen = Button::with_label(strings.generate_button);
+    let controls_spacer = gtk::Box::builder().hexpand(true).build();
+    controls_box.append(&controls_spacer);
+
+    let btn_gen = icon_label_button("view-refresh-symbolic", strings.generate_button).0;
     controls_box.append(&btn_gen);
 
-    let btn_copy = Button::with_label(strings.copy_button);
+    let (btn_copy, copy_icon, copy_label) =
+        icon_label_button("edit-copy-symbolic", strings.copy_button);
+    btn_copy.add_css_class("suggested-action");
     controls_box.append(&btn_copy);
-
-    let copy_feedback_revealer = Revealer::builder()
-        .transition_type(RevealerTransitionType::Crossfade)
-        .reveal_child(false)
-        .build();
-    let copy_feedback_box = gtk::Box::builder()
-        .orientation(Orientation::Horizontal)
-        .spacing(6)
-        .halign(gtk::Align::Center)
-        .build();
-    copy_feedback_box.add_css_class("copy-feedback-box");
-    let copy_feedback_icon = Label::new(Some("✅"));
-    copy_feedback_icon.add_css_class("copy-feedback-icon");
-    let copy_feedback_label = Label::new(Some(strings.copy_success_label));
-    copy_feedback_label.add_css_class("copy-feedback-label");
-    copy_feedback_box.append(&copy_feedback_icon);
-    copy_feedback_box.append(&copy_feedback_label);
-    copy_feedback_revealer.set_child(Some(&copy_feedback_box));
-    box_container.append(&copy_feedback_revealer);
 
     let charset_section = gtk::Box::builder()
         .orientation(Orientation::Vertical)
-        .spacing(6)
+        .spacing(8)
         .build();
     let charset_label = Label::new(Some(strings.charset_section_label));
     charset_label.set_halign(gtk::Align::Start);
+    charset_label.add_css_class("section-heading");
     charset_section.append(&charset_label);
 
-    let charset_flow = FlowBox::builder()
+    let charset_grid = gtk::Grid::builder()
         .column_spacing(12)
-        .row_spacing(6)
-        .selection_mode(SelectionMode::None)
-        .max_children_per_line(2)
+        .row_spacing(4)
+        .column_homogeneous(true)
+        .css_classes(vec!["card".to_string(), "options-card".to_string()])
         .build();
 
     let chk_lowercase = CheckButton::with_label(strings.lowercase_label);
     chk_lowercase.set_active(settings.borrow().allow_lowercase);
-    charset_flow.insert(&chk_lowercase, -1);
+    charset_grid.attach(&chk_lowercase, 0, 0, 1, 1);
 
     let chk_uppercase = CheckButton::with_label(strings.uppercase_label);
     chk_uppercase.set_active(settings.borrow().allow_uppercase);
-    charset_flow.insert(&chk_uppercase, -1);
+    charset_grid.attach(&chk_uppercase, 1, 0, 1, 1);
 
     let chk_digits = CheckButton::with_label(strings.digits_label);
     chk_digits.set_active(settings.borrow().allow_digits);
-    charset_flow.insert(&chk_digits, -1);
+    charset_grid.attach(&chk_digits, 0, 1, 1, 1);
 
     let chk_special = CheckButton::with_label(strings.special_label);
     chk_special.set_active(settings.borrow().allow_special);
-    charset_flow.insert(&chk_special, -1);
+    charset_grid.attach(&chk_special, 1, 1, 1, 1);
 
-    charset_section.append(&charset_flow);
+    charset_section.append(&charset_grid);
     box_container.append(&charset_section);
 
     let status_box = gtk::Box::builder()
         .orientation(Orientation::Horizontal)
-        .spacing(15)
-        .halign(gtk::Align::Center)
+        .spacing(18)
+        .css_classes(vec!["card".to_string(), "options-card".to_string()])
         .build();
     box_container.append(&status_box);
 
@@ -982,9 +1032,6 @@ fn build_ui(app: &Application) {
     let chk_default_strategy = CheckButton::with_label(strings.default_strategy_label);
     chk_default_strategy.set_active(settings.borrow().default_strategy);
     status_box.append(&chk_default_strategy);
-
-    let lbl_timer = Label::new(None);
-    status_box.append(&lbl_timer);
 
     let runtime_auto_close_active = Rc::new(Cell::new(settings.borrow().auto_close));
     let remaining = Rc::new(RefCell::new(CLOSE_AFTER_SEC));
@@ -1007,12 +1054,15 @@ fn build_ui(app: &Application) {
     });
     window.add_controller(gesture);
 
-    let copy_state = CopyState::new();
+    // Created before present() so its wl_keyboard sees the first enter.
+    let copy_state = CopyState::new(WaylandSelection::new(&gtk::prelude::WidgetExt::display(&window)));
 
     let feedback_timeout = Rc::new(RefCell::new(None::<SourceId>));
     let show_copy_feedback: Rc<dyn Fn()> = {
-        let revealer = copy_feedback_revealer.clone();
+        let btn_copy = btn_copy.clone();
         let timeout_handle = feedback_timeout.clone();
+        let copy_button_label = strings.copy_button;
+        let copy_success_label = strings.copy_success_label;
         Rc::new(move || {
             {
                 let mut handle = timeout_handle.borrow_mut();
@@ -1020,11 +1070,17 @@ fn build_ui(app: &Application) {
                     id.remove();
                 }
             }
-            revealer.set_reveal_child(true);
+            copy_icon.set_icon_name(Some("object-select-symbolic"));
+            copy_label.set_label(copy_success_label);
+            btn_copy.add_css_class("copied");
             let timeout_handle_clone = timeout_handle.clone();
-            let revealer_clone = revealer.clone();
+            let btn_copy = btn_copy.clone();
+            let copy_icon = copy_icon.clone();
+            let copy_label = copy_label.clone();
             let source_id = glib::timeout_add_local(Duration::from_millis(1500), move || {
-                revealer_clone.set_reveal_child(false);
+                copy_icon.set_icon_name(Some("edit-copy-symbolic"));
+                copy_label.set_label(copy_button_label);
+                btn_copy.remove_css_class("copied");
                 timeout_handle_clone.borrow_mut().take();
                 glib::ControlFlow::Break
             });
@@ -1218,7 +1274,9 @@ fn build_ui(app: &Application) {
         ) {
             let text = entry.text().to_string();
             if !window_is_active(&window) {
-                window.present();
+                // Start with focus on "New" so Enter regenerates, rather than on the
+    // spin button whose text field would otherwise show a focus ring.
+    window.present();
             }
             schedule_auto_copy(
                 &window,
@@ -1371,11 +1429,15 @@ fn build_ui(app: &Application) {
 
     window.present();
 
+
     // Generate initial password
     let update_password_for_idle = update_password.clone();
     let settings_for_idle = settings.clone();
     glib::idle_add_local_once(move || {
         update_password_for_idle(settings_for_idle.borrow().groups);
+        // Focus "New" so Enter regenerates; the spin button would otherwise
+        // take the initial focus and show a focus ring.
+        btn_gen.grab_focus();
     });
 }
 
@@ -1587,16 +1649,19 @@ struct CopyState {
     // GDK processed the keyboard-enter event, which is when a valid Wayland
     // input serial for clipboard writes is guaranteed to exist.
     keyboard_focus: Cell<bool>,
+    // Sets the selection with the keyboard-enter serial; see the module.
+    wayland: Option<Rc<WaylandSelection>>,
 }
 
 impl CopyState {
-    fn new() -> Rc<Self> {
+    fn new(wayland: Option<Rc<WaylandSelection>>) -> Rc<Self> {
         Rc::new(CopyState {
             pending: RefCell::new(None),
             dc_state: RefCell::new(None),
             gen: Cell::new(0),
             feedback_shown: Cell::new(false),
             keyboard_focus: Cell::new(false),
+            wayland,
         })
     }
 
@@ -1649,7 +1714,15 @@ fn try_pending_copy(
         None => return false,
     };
     if dc != DC_OK {
-        copy_to_clipboard(window, &text);
+        // GTK's clipboard uses the serial of the last key/button press, which
+        // is stale before the first user input, so prefer the enter serial.
+        let copied = copy_state
+            .wayland
+            .as_ref()
+            .is_some_and(|w| w.copy(&text));
+        if !copied {
+            copy_to_clipboard(window, &text);
+        }
     }
     if !copy_state.feedback_shown.get() {
         show_feedback();

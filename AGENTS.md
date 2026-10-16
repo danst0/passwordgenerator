@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents (Claude Code, Codex, …) when working with code in this repository.
 
 ## Project Overview
 
@@ -27,7 +27,7 @@ Requires `flatpak`, `flatpak-builder`, and `cargo`. The script auto-installs req
 
 ## Architecture
 
-This is a single-file application (`src/main.rs`, ~1000 lines) with all logic in one place.
+Almost all logic lives in `src/main.rs` (~1800 lines). `src/wayland_selection.rs` sets the clipboard on GTK's own Wayland connection with the keyboard-enter serial, because GTK's clipboard only uses key/button-press serials and is ignored by mutter before the first user input (needed for copy-on-startup).
 
 ### Key Data Structures
 
@@ -57,7 +57,8 @@ Translations are inline in `main.rs` using a factory pattern:
 
 ## Key Files
 
-- `src/main.rs` - All application code
+- `src/main.rs` - Application code
+- `src/wayland_selection.rs` - Wayland clipboard write for copy-on-startup
 - `data/*.desktop` - Desktop entry
 - `data/*.metainfo.xml` - AppStream metadata (update for releases)
 - `flathub/*.yml` - Flatpak manifests
