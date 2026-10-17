@@ -2,6 +2,8 @@
 
 A simple, efficient password generator written in Rust using GTK4.
 
+Website: <https://passwort.dumke.me/>
+
 ## Features
 
 - **Grouped Output**: Generates passwords in readable groups of 5 characters (e.g., `abcde-FGHIJ-12345`).

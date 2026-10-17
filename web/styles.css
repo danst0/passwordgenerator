@@ -309,6 +309,14 @@ h1 em {
 .chip.red { color: var(--red); }
 .chip.dim { color: rgba(239, 231, 214, 0.6); }
 
+/* Easter egg: der „Kopiert“-Chip kopiert wirklich */
+button.chip {
+  background: none;
+  line-height: inherit;
+  cursor: pointer;
+}
+button.chip:hover { background: rgba(38, 162, 105, 0.12); }
+
 .strength-note {
   margin-top: 0.9rem;
   font-size: 0.88rem;
