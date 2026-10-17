@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Passwortgenerator — starke Passwörter, komplett offline</title>
+<meta name="description" content="Natives GTK4-Programm für GNOME: kryptografisch starke Passwörter lokal erzeugen — ohne Netz, ohne Cloud, ohne Telemetrie. Auf Flathub, in acht Sprachen.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="canonical" href="https://passwort.dumke.me/">
+<meta property="og:title" content="Passwortgenerator — starke Passwörter, komplett offline">
+<meta property="og:description" content="Natives GTK4-Programm für GNOME: kryptografisch starke Passwörter, lokal erzeugt. Kein Netz, keine Cloud, keine Telemetrie.">
+<meta property="og:image" content="https://passwort.dumke.me/assets/dark_de.png">
+<meta property="og:url" content="https://passwort.dumke.me/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_DE">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <img src="assets/icon.png" alt="" width="34" height="34">
+  <a class="brand" href="/">Passwortgenerator</a>
+  <nav>
+    <a href="#vorteile">Vorteile</a>
+    <a href="#sicherheit">Sicherheit</a>
+    <a href="#install">Installieren</a>
+    <a class="gh" href="https://github.com/danst0/passwordgenerator">GitHub&nbsp;↗</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ───────────────────────── hero ───────────────────────── -->
+<section class="hero">
+  <p class="kicker">Freie Software · GNOME · komplett offline</p>
+  <h1>Starkes Passwort. <em>Nur bei dir.</em></h1>
+  <p class="lede">Der Passwortgenerator ist eine native GTK4-App für GNOME:
+  kryptografisch starke Passwörter, <strong>lokal erzeugt</strong> —
+  in Gruppen zu je fünf Zeichen, mit einem Klick in der Zwischenablage.
+  Kein Netz. Keine Cloud. Keine Telemetrie.</p>
+
+  <div class="cta-row">
+    <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+      <img src="assets/flathub-badge-de.svg" alt="Auf Flathub verfügbar" width="240" height="80">
+    </a>
+    <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">
+      flatpak install flathub io.github.danst0.passwordgenerator
+    </button>
+  </div>
+
+  <div class="desk">
+    <figure class="app-card" aria-label="Das Fenster des Passwortgenerators mit einem frisch erzeugten Passwort">
+      <div class="file-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">Passwortgenerator</span>
+      </div>
+      <pre class="app-lines"><span class="typed-wrap"><span class="typed">hT4k#-qW9m!-Lp2xZ</span><span class="caret"></span></span></pre>
+      <div class="app-chips">
+        <span class="chip green">Kopiert ✓</span>
+        <span class="chip dim">Schließt in 10 s</span>
+      </div>
+    </figure>
+
+    <div class="strength-card" role="img" aria-label="Die Stärke-Anzeige des Passworts: 91,9 Bit Entropie, stark, Crack-Zeit 75 Millionen Jahre">
+      <p class="strength-title">Stärke</p>
+      <div class="chips">
+        <span class="chip blue">91,9 Bit Entropie</span>
+        <span class="chip green">Stark</span>
+        <span class="chip red">Offline-Angriff: 7,5 × 10⁷ Jahre</span>
+      </div>
+      <p class="strength-note">Genauer Wert, Einordnung und Brute-Force-Schätzung — mit genannter
+      Annahme (10¹² Versuche/s, schneller Hash), nicht als Marketing.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────── vorteile ─────────────────────── -->
+<section id="vorteile">
+  <p class="sec-label"><b>01</b> Vorteile</p>
+  <h2>Dein Passwort verlässt dein System nie.</h2>
+  <p class="sec-intro">Alles passiert lokal in einem GTK4-Programm, verpackt als Flatpak:
+  es gibt keinen Server, der etwas speichern, verlieren oder weitergeben könnte —
+  und keine Funktion, die du dafür einzeln nachjustieren müsstest.</p>
+
+  <div class="shots">
+    <div class="shot reveal">
+      <img src="assets/dark_de.png" alt="Das Fenster im dunklen Modus, mit Passwort, Zeichensätzen und Optionen">
+    </div>
+    <div class="shot shot-small reveal">
+      <img src="assets/light_de.png" alt="Das Fenster im hellen Modus">
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature reveal"><span class="check">[x]</span><h3>100 % offline</h3>
+      <p>Kein Netzwerkzugriff — weder im Flatpak noch im Code. Keine Accounts,
+      keine Cloud, keine Telemetrie: es gibt schlicht nichts, was verloren,
+      gestohlen oder verkauft werden könnte.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Kryptografische Zufallszahlen</h3>
+      <p>Die Zeichen werden über den CSPRNG des Betriebssystems (OsRng) gezogen —
+      dieselbe Quelle, die auch für TLS-Schlüssel genutzt wird.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Gruppen zu fünf</h3>
+      <p><code>abcde-FGHIJ-12345</code>: leichter zu lesen, zu diktieren und
+      zu tippen als ein Buchstabenbrei — und die Länge bleibt auf einen Blick nachvollziehbar.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Ehrliche Stärke</h3>
+      <p>Genauer Entropie-Wert, Einordnung und geschätzte Brute-Force-Zeit.
+      Die Annahme (10¹² Versuche/s, schneller Hash) wird genannt — die
+      Standardstrategie wird nicht stärker angegeben, als sie ist.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Ein Klick, fertig</h3>
+      <p>Sofort in die Zwischenablage, auf Wunsch schon beim Start, mit
+      sichtbarer Bestätigung. Danach schließt sich das Fenster selbst —
+      das Passwort ist nicht mehr auf dem Bildschirm, aber weiter einfügbar.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Passend zur Policy</h3>
+      <p>Kleinbuchstaben, Großbuchstaben, Ziffern und Sonderzeichen einzeln
+      abschaltbar — plus eine Standardstrategie, die mindestens je eines
+      davon garantiert.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Acht Sprachen</h3>
+      <p>Deutsch, Englisch, Japanisch, Schwedisch, Spanisch, Italienisch,
+      Französisch und Ukrainisch — die Oberfläche folgt der System-Sprache.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Passt zum System</h3>
+      <p>Hell oder dunkel nach dem System-Setting. Enter erzeugt neu,
+      Strg+W schließt, Strg+Q beendet — der ganze Ablauf bleibt an der Taste.</p></div>
+  </div>
+</section>
+
+<!-- ──────────────────────── sicherheit ───────────────────── -->
+<section id="sicherheit">
+  <p class="sec-label"><b>02</b> Sicherheit</p>
+  <h2>Lokal erzeugt, nirgends gespeichert.</h2>
+  <p class="sec-intro">Der Generator ist so klein wie möglich: GTK4 für die Oberfläche,
+  <code>rand</code> für den Zufall, ein paar Wayland-Bibliotheken für die
+  Zwischenablage — keine Konten, keine Konnektoren, keine Dienste im
+  Hintergrund. Die wichtigsten Eigenschaften:</p>
+
+  <div class="sec-grid">
+    <div class="sec-item reveal">
+      <h3><span class="no">a.</span>Kein Netzwerk</h3>
+      <p>Die Flatpak deklariert kein <code>--share=network</code>; der Code
+      enthält keinerlei Netzwerkzugriff. Der Generator kann nichts senden,
+      weil er technisch gar nicht kann.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">b.</span>Kein Log, keine Historie</h3>
+      <p>Passwörter werden weder auf der Konsole noch im System-Journal
+      geschrieben und nie auf die Platte gespeichert — gemerkt werden
+      nur deine Einstellungen.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">c.</span>Kurz auf dem Schirm</h3>
+      <p>Auto-Schließen beendet das Programm nach 10 Sekunden; ein
+      Klick ins Fenster hält den Countdown an. In der Zwischenablage
+      bleibt das Passwort, bis du etwas anderes kopierst — wer einen
+      Clipboard-Verlauf nutzt, sollte es dort löschen.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">d.</span>Nachvollziehbar</h3>
+      <p>Quelloffen unter CC-BY-SA-4.0: die Erzeugung, die Entropie-Berechnung
+      und die Stärke-Schätzung sind im Code nachprüfbar und getestet.</p>
+    </div>
+  </div>
+
+  <div class="terminal reveal" aria-label="security.txt: wie man Schwachstellen meldet">
+    <div class="file-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="name">security.txt</span>
+    </div>
+<pre>
+Contact: https://github.com/danst0/passwordgenerator/security/advisories/new
+Expires: 2027-10-17T00:00:00.000Z
+Policy: https://github.com/danst0/passwordgenerator/blob/main/SECURITY.md
+Preferred-Languages: en, de
+Canonical: https://passwort.dumke.me/.well-known/security.txt
+</pre>
+  </div>
+  <p class="sec-report">Schwachstelle gefunden? Bitte <a href="https://github.com/danst0/passwordgenerator/security/advisories/new">privat über GitHub melden</a> —
+  nicht als öffentliches Issue. Ich bestätige Meldungen in der Regel innerhalb
+  von 72 Stunden; veröffentlicht wird nach dem Fix.</p>
+</section>
+
+<!-- ──────────────────────── install ──────────────────────── -->
+<section id="install">
+  <p class="sec-label"><b>03</b> Installieren</p>
+  <h2>Ein Befehl, und er ist da.</h2>
+
+  <div class="install-grid">
+    <div class="install-card reveal">
+      <h3>Flathub</h3>
+      <p>Der empfohlene Weg auf jeder Linux-Distribution — aktuell auf
+      dem GNOME-50-Runtime, bei jeder Freigabe automatisch aktualisiert.</p>
+      <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+        <img src="assets/flathub-badge-de.svg" alt="Auf Flathub verfügbar" width="240" height="80">
+      </a>
+      <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">flatpak install flathub io.github.danst0.passwordgenerator</button>
+    </div>
+
+    <div class="install-card reveal">
+      <h3>Aus dem Quellcode</h3>
+      <p>Rust und GTK4-Entwicklungsbibliotheken — für alle, die es selbst
+      bauen oder umpatchen wollen.</p>
+      <button class="cmd" data-copy="git clone https://github.com/danst0/passwordgenerator &amp;&amp; cd passwordgenerator &amp;&amp; cargo build">git clone …/passwordgenerator &amp;&amp; cargo build</button>
+      <span class="alt"><a href="https://github.com/danst0/passwordgenerator">Quellcode auf GitHub</a></span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="meaning"><b>Passwort</b> — das Wort, mit dem man durch ein Tor
+  kommt. Hier: ein Wort, das nur du kennst. Erzeugt in Millisekunden,
+  kopiert mit einem Klick, nirgends gespeichert.</p>
+  <nav>
+    <a href="https://github.com/danst0/passwordgenerator">GitHub</a>
+    <a href="https://flathub.org/apps/io.github.danst0.passwordgenerator">Flathub</a>
+    <a href="/.well-known/security.txt">security.txt</a>
+    <a href="https://github.com/danst0/passwordgenerator/blob/main/LICENSE">CC-BY-SA-4.0</a>
+  </nav>
+  <p>Diese Seite setzt keine Cookies und lädt nichts von Dritten.</p>
+  <p>© Dr. Daniel Dumke</p>
+</footer>
+</div>
+
+<script src="site.js"></script>
+</body>
+</html>

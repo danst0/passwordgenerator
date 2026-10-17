@@ -33,7 +33,7 @@ Almost all logic lives in `src/main.rs` (~1800 lines). `src/wayland_selection.rs
 
 - **`AppSettings`** - Serializable user preferences persisted to `~/.config/passwordgenerator/settings.json`
 - **`GenerationOptions`** - Character set toggles (lowercase, uppercase, digits, special)
-- **`I18nStrings`** - Localization strings with factory pattern for 7 supported languages
+- **`I18nStrings`** - Localization strings with factory pattern for 8 supported languages
 
 ### Password Generation
 

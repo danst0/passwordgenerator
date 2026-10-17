@@ -1,0 +1,5 @@
+Contact: https://github.com/danst0/passwordgenerator/security/advisories/new
+Expires: 2027-10-17T00:00:00.000Z
+Policy: https://github.com/danst0/passwordgenerator/blob/main/SECURITY.md
+Preferred-Languages: en, de
+Canonical: https://passwort.dumke.me/.well-known/security.txt
