@@ -62,6 +62,7 @@ Translations are inline in `main.rs` using a factory pattern:
 - `data/*.desktop` - Desktop entry
 - `data/*.metainfo.xml` - AppStream metadata (update for releases)
 - `flathub/*.yml` - Flatpak manifests
+- `web/` - Static website (https://passwort.dumke.me/). The `index.html` pages are generated: edit `site-src/template.html` and `site-src/i18n/<lang>.json`, then run `python3 site-src/build.py` (English at the root, other languages under `web/<lang>/`; the root page redirects to the browser language)
 
 ## Release Process
 

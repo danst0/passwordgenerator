@@ -8,7 +8,7 @@ document.querySelectorAll(".cmd[data-copy]").forEach((btn) => {
       if (!btn.querySelector(".copied")) {
         const ok = document.createElement("span");
         ok.className = "copied";
-        ok.textContent = "kopiert ✓";
+        ok.textContent = document.body.dataset.copied || "✓";
         btn.appendChild(ok);
         setTimeout(() => ok.remove(), 1600);
       }
@@ -51,16 +51,29 @@ const typed = document.querySelector(".typed");
 const egg = document.querySelector(".chip.egg");
 if (typed && egg && window.crypto && crypto.getRandomValues) {
   typed.textContent = generatePassword(3);
+  const label = egg.textContent;
   egg.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(typed.textContent);
-      egg.textContent = "Echt kopiert ✓";
-      setTimeout(() => (egg.textContent = "Kopiert ✓"), 1600);
+      egg.textContent = egg.dataset.done;
+      setTimeout(() => (egg.textContent = label), 1600);
     } catch (e) {
       /* clipboard unavailable */
     }
   });
 }
+
+// remember an explicit language choice, so the root page stops
+// redirecting to the browser language
+document.querySelectorAll("a[data-lang]").forEach((a) => {
+  a.addEventListener("click", () => {
+    try {
+      localStorage.setItem("lang", a.dataset.lang);
+    } catch (e) {
+      /* storage unavailable — the browser language decides */
+    }
+  });
+});
 
 // gentle reveal on scroll
 const io = new IntersectionObserver(

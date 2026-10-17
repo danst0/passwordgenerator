@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{detect}}<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<link rel="icon" type="image/png" href="{{root}}assets/favicon.png">
+<link rel="canonical" href="{{url}}">
+{{alternates}}
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:image" content="https://passwort.dumke.me/assets/dark_{{shot}}.png">
+<meta property="og:url" content="{{url}}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="{{og_locale}}">
+<link rel="stylesheet" href="{{root}}styles.css">
+</head>
+<body data-copied="{{cmd_copied}}">
+
+<div class="wrap">
+<header>
+  <img src="{{root}}assets/icon.png" alt="" width="34" height="34">
+  <a class="brand" href="{{home}}">{{app_name}}</a>
+  <nav>
+    <a href="#features">{{nav_features}}</a>
+    <a href="#security">{{nav_security}}</a>
+    <a href="#install">{{nav_install}}</a>
+    <a class="gh" href="https://github.com/danst0/passwordgenerator">GitHub&nbsp;↗</a>
+    <a class="lang-link" href="#languages" title="{{langs_label}}">{{lang_code}}</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ───────────────────────── hero ───────────────────────── -->
+<section class="hero">
+  <p class="kicker">{{kicker}}</p>
+  <h1>{{h1}}</h1>
+  <p class="lede">{{lede}}</p>
+
+  <div class="cta-row">
+    <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+      <img src="{{root}}assets/flathub-badge-{{lang}}.svg" alt="{{flathub_alt}}" width="240" height="80">
+    </a>
+    <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">
+      flatpak install flathub io.github.danst0.passwordgenerator
+    </button>
+  </div>
+
+  <div class="desk">
+    <figure class="app-card" aria-label="{{app_card_label}}">
+      <div class="file-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">{{app_name}}</span>
+      </div>
+      <pre class="app-lines"><span class="typed-wrap"><span class="typed">hT4k#-qW9m!-Lp2xZ</span><span class="caret"></span></span></pre>
+      <div class="app-chips">
+        <button type="button" class="chip green egg" aria-label="{{egg_label}}" data-done="{{egg_done}}">{{egg_text}}</button>
+        <span class="chip dim">{{closes}}</span>
+      </div>
+    </figure>
+
+    <div class="strength-card" role="img" aria-label="{{strength_aria}}">
+      <p class="strength-title">{{strength_title}}</p>
+      <div class="chips">
+        <span class="chip blue">{{chip_entropy}}</span>
+        <span class="chip green">{{chip_strength}}</span>
+        <span class="chip red">{{chip_crack}}</span>
+      </div>
+      <p class="strength-note">{{strength_note}}</p>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────── features ─────────────────────── -->
+<section id="features">
+  <p class="sec-label"><b>01</b> {{nav_features}}</p>
+  <h2>{{features_h2}}</h2>
+  <p class="sec-intro">{{features_intro}}</p>
+
+  <div class="shots">
+    <div class="shot reveal">
+      <img src="{{root}}assets/dark_{{shot}}.png" alt="{{shot_dark_alt}}">
+    </div>
+    <div class="shot shot-small reveal">
+      <img src="{{root}}assets/light_{{shot}}.png" alt="{{shot_light_alt}}">
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature reveal"><span class="check">[x]</span><h3>{{f1_h}}</h3>
+      <p>{{f1_p}}</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>{{f2_h}}</h3>
+      <p>{{f2_p}}</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>{{f3_h}}</h3>
+      <p>{{f3_p}}</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>{{f4_h}}</h3>
+      <p>{{f4_p}}</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>{{f5_h}}</h3>
+      <p>{{f5_p}}</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>{{f6_h}}</h3>
+      <p>{{f6_p}}</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>{{f7_h}}</h3>
+      <p>{{f7_p}}</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>{{f8_h}}</h3>
+      <p>{{f8_p}}</p></div>
+  </div>
+</section>
+
+<!-- ──────────────────────── security ─────────────────────── -->
+<section id="security">
+  <p class="sec-label"><b>02</b> {{nav_security}}</p>
+  <h2>{{security_h2}}</h2>
+  <p class="sec-intro">{{security_intro}}</p>
+
+  <div class="sec-grid">
+    <div class="sec-item reveal">
+      <h3><span class="no">a.</span>{{s1_h}}</h3>
+      <p>{{s1_p}}</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">b.</span>{{s2_h}}</h3>
+      <p>{{s2_p}}</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">c.</span>{{s3_h}}</h3>
+      <p>{{s3_p}}</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">d.</span>{{s4_h}}</h3>
+      <p>{{s4_p}}</p>
+    </div>
+  </div>
+
+  <div class="terminal reveal" aria-label="{{terminal_label}}">
+    <div class="file-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="name">security.txt</span>
+    </div>
+<pre>
+{{security_txt}}</pre>
+  </div>
+  <p class="sec-report">{{report}}</p>
+</section>
+
+<!-- ──────────────────────── install ──────────────────────── -->
+<section id="install">
+  <p class="sec-label"><b>03</b> {{nav_install}}</p>
+  <h2>{{install_h2}}</h2>
+
+  <div class="install-grid">
+    <div class="install-card reveal">
+      <h3>Flathub</h3>
+      <p>{{flathub_p}}</p>
+      <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+        <img src="{{root}}assets/flathub-badge-{{lang}}.svg" alt="{{flathub_alt}}" width="240" height="80">
+      </a>
+      <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">flatpak install flathub io.github.danst0.passwordgenerator</button>
+    </div>
+
+    <div class="install-card reveal">
+      <h3>{{source_h}}</h3>
+      <p>{{source_p}}</p>
+      <button class="cmd" data-copy="git clone https://github.com/danst0/passwordgenerator &amp;&amp; cd passwordgenerator &amp;&amp; cargo build">git clone …/passwordgenerator &amp;&amp; cargo build</button>
+      <span class="alt"><a href="https://github.com/danst0/passwordgenerator">{{source_link}}</a></span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="meaning">{{footer_meaning}}</p>
+  <nav>
+    <a href="https://github.com/danst0/passwordgenerator">GitHub</a>
+    <a href="https://flathub.org/apps/io.github.danst0.passwordgenerator">Flathub</a>
+    <a href="{{root}}.well-known/security.txt">security.txt</a>
+    <a href="https://github.com/danst0/passwordgenerator/blob/main/LICENSE">CC BY-SA 4.0</a>
+  </nav>
+  <nav id="languages" class="langs" aria-label="{{langs_label}}">
+{{lang_links}}
+  </nav>
+  <p>{{footer_cookies}}</p>
+  <p>© Dr. Daniel Dumke</p>
+</footer>
+</div>
+
+<script src="{{root}}site.js"></script>
+</body>
+</html>

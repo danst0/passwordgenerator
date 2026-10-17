@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>パスワードジェネレーター — 強力なパスワードを完全オフラインで</title>
+<meta name="description" content="GNOME 向けのネイティブ GTK4 アプリ。暗号論的に安全なパスワードをローカルで生成します。ネットワークもクラウドもテレメトリーもなし。Flathub で配布、8 言語に対応。">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="canonical" href="https://passwort.dumke.me/ja/">
+<link rel="alternate" hreflang="en" href="https://passwort.dumke.me/">
+<link rel="alternate" hreflang="de" href="https://passwort.dumke.me/de/">
+<link rel="alternate" hreflang="fr" href="https://passwort.dumke.me/fr/">
+<link rel="alternate" hreflang="es" href="https://passwort.dumke.me/es/">
+<link rel="alternate" hreflang="it" href="https://passwort.dumke.me/it/">
+<link rel="alternate" hreflang="sv" href="https://passwort.dumke.me/sv/">
+<link rel="alternate" hreflang="uk" href="https://passwort.dumke.me/uk/">
+<link rel="alternate" hreflang="ja" href="https://passwort.dumke.me/ja/">
+<link rel="alternate" hreflang="x-default" href="https://passwort.dumke.me/">
+<meta property="og:title" content="パスワードジェネレーター — 強力なパスワードを完全オフラインで">
+<meta property="og:description" content="GNOME 向けのネイティブ GTK4 アプリ。暗号論的に安全なパスワードをローカルで生成します。ネットワークもクラウドもテレメトリーもなし。Flathub で配布、8 言語に対応。">
+<meta property="og:image" content="https://passwort.dumke.me/assets/dark_ja.png">
+<meta property="og:url" content="https://passwort.dumke.me/ja/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-copied="コピーしました ✓">
+
+<div class="wrap">
+<header>
+  <img src="../assets/icon.png" alt="" width="34" height="34">
+  <a class="brand" href="./">パスワードジェネレーター</a>
+  <nav>
+    <a href="#features">特長</a>
+    <a href="#security">セキュリティ</a>
+    <a href="#install">インストール</a>
+    <a class="gh" href="https://github.com/danst0/passwordgenerator">GitHub&nbsp;↗</a>
+    <a class="lang-link" href="#languages" title="言語">JA</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ───────────────────────── hero ───────────────────────── -->
+<section class="hero">
+  <p class="kicker">フリーソフトウェア · GNOME · 完全オフライン</p>
+  <h1>強いパスワードを。<em>あなたの手元だけに。</em></h1>
+  <p class="lede">パスワードジェネレーターは GNOME 向けのネイティブ GTK4 アプリです。暗号論的に安全なパスワードを<strong>あなたのコンピューター上で</strong>生成し、5 文字ずつのグループで表示。ワンクリックでクリップボードにコピーできます。ネットワークなし。クラウドなし。テレメトリーなし。</p>
+
+  <div class="cta-row">
+    <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+      <img src="../assets/flathub-badge-ja.svg" alt="Flathub で入手" width="240" height="80">
+    </a>
+    <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">
+      flatpak install flathub io.github.danst0.passwordgenerator
+    </button>
+  </div>
+
+  <div class="desk">
+    <figure class="app-card" aria-label="生成したばかりのパスワードを表示しているパスワードジェネレーターのウィンドウ">
+      <div class="file-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">パスワードジェネレーター</span>
+      </div>
+      <pre class="app-lines"><span class="typed-wrap"><span class="typed">hT4k#-qW9m!-Lp2xZ</span><span class="caret"></span></span></pre>
+      <div class="app-chips">
+        <button type="button" class="chip green egg" aria-label="表示中のパスワードをコピー" data-done="本当にコピーしました ✓">コピーしました ✓</button>
+        <span class="chip dim">あと 10 秒で閉じます</span>
+      </div>
+    </figure>
+
+    <div class="strength-card" role="img" aria-label="強度表示: エントロピー 91.9 ビット、評価「強い」、オフライン攻撃の推定所要時間 7500 万年">
+      <p class="strength-title">強度</p>
+      <div class="chips">
+        <span class="chip blue">エントロピー 91.9 ビット</span>
+        <span class="chip green">強い</span>
+        <span class="chip red">オフライン攻撃: 7.5 × 10⁷ 年</span>
+      </div>
+      <p class="strength-note">正確な値、評価、総当たり攻撃にかかる推定時間を、前提条件（毎秒 10¹² 回の試行、高速ハッシュ）とともに表示します。誇張はしません。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────── features ─────────────────────── -->
+<section id="features">
+  <p class="sec-label"><b>01</b> 特長</p>
+  <h2>パスワードはあなたのコンピューターの中だけに。</h2>
+  <p class="sec-intro">すべては Flatpak としてパッケージされた GTK4 アプリの中で、ローカルに動作します。何かを保存したり、失ったり、第三者に渡したりするサーバーは存在せず、そのための設定も必要ありません。</p>
+
+  <div class="shots">
+    <div class="shot reveal">
+      <img src="../assets/dark_ja.png" alt="ダークモードのウィンドウ（パスワード、文字種、オプション）">
+    </div>
+    <div class="shot shot-small reveal">
+      <img src="../assets/light_ja.png" alt="ライトモードのウィンドウ">
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature reveal"><span class="check">[x]</span><h3>100% オフライン</h3>
+      <p>ネットワークへのアクセスは一切ありません。Flatpak の権限にも、コードにも。アカウントもクラウドもテレメトリーもないので、失われたり、盗まれたり、売られたりするものがそもそも存在しません。</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>暗号論的な乱数</h3>
+      <p>すべての文字は OS の乱数生成器（OsRng）から選ばれます。暗号化ソフトウェアが鍵の生成に使うのと同じ乱数源です。</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>5 文字ずつのグループ</h3>
+      <p><code>abcde-FGHIJ-12345</code> のように区切ることで、読む・口頭で伝える・入力するのが楽になり、長さもひと目でわかります。</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>正直な強度表示</h3>
+      <p>正確なエントロピー、評価、推定攻撃時間を表示します。前提条件（毎秒 10¹² 回の試行、高速ハッシュ）も明記し、標準戦略を実際より強く見せることはありません。</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>ワンクリックで完了</h3>
+      <p>パスワードはすぐにクリップボードへ。希望すれば起動時に自動でコピーし、コピーできたことをはっきり表示します。その後ウィンドウは自動的に閉じ、パスワードは画面から消えますが、貼り付けはそのまま可能です。</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>どんなポリシーにも対応</h3>
+      <p>小文字・大文字・数字・記号はそれぞれ個別にオフにできます。標準戦略では、大文字・数字・記号が少なくとも 1 文字ずつ含まれることが保証されます。</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>8 言語に対応</h3>
+      <p>日本語、英語、ドイツ語、フランス語、イタリア語、スペイン語、スウェーデン語、ウクライナ語。表示言語はシステムの設定に従います。</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>システムになじむ</h3>
+      <p>ライト／ダークはシステム設定に従います。Enter で新しいパスワードを生成、Ctrl+W でウィンドウを閉じ、Ctrl+Q で終了。マウスがなくても操作できます。</p></div>
+  </div>
+</section>
+
+<!-- ──────────────────────── security ─────────────────────── -->
+<section id="security">
+  <p class="sec-label"><b>02</b> セキュリティ</p>
+  <h2>ローカルで生成し、どこにも保存しない。</h2>
+  <p class="sec-intro">このジェネレーターは意図的に小さく作られています。UI には GTK4、乱数には <code>rand</code>、クリップボードにはいくつかの Wayland ライブラリを使用。アカウントも外部接続もバックグラウンドサービスもありません。主な特性は次のとおりです。</p>
+
+  <div class="sec-grid">
+    <div class="sec-item reveal">
+      <h3><span class="no">a.</span>ネットワークなし</h3>
+      <p>Flatpak は <code>--share=network</code> を要求せず、コードにもネットワークへのアクセスは含まれていません。仮に送信しようとしても、何も送信できません。</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">b.</span>ログも履歴もなし</h3>
+      <p>パスワードがコンソールやシステムジャーナルに出力されることはなく、ディスクに書き込まれることもありません。保存されるのは設定だけです。</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">c.</span>画面に表示されるのは短時間</h3>
+      <p>「自動終了」を有効にすると、アプリは 10 秒後に終了します。ウィンドウ内をクリックするとカウントダウンが止まります。パスワードは別のものをコピーするまでクリップボードに残ります。クリップボード履歴を使っている場合は、そこから削除してください。</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">d.</span>検証可能</h3>
+      <p>CC BY-SA 4.0 のオープンソースです。生成処理、エントロピー計算、強度の推定はコードで確認でき、テストで検証されています。</p>
+    </div>
+  </div>
+
+  <div class="terminal reveal" aria-label="security.txt: 脆弱性の報告方法">
+    <div class="file-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="name">security.txt</span>
+    </div>
+<pre>
+Contact: https://github.com/danst0/passwordgenerator/security/advisories/new
+Expires: 2027-10-17T00:00:00.000Z
+Policy: https://github.com/danst0/passwordgenerator/blob/main/SECURITY.md
+Preferred-Languages: en, de
+Canonical: https://passwort.dumke.me/.well-known/security.txt
+</pre>
+  </div>
+  <p class="sec-report">脆弱性を見つけた場合は、公開の Issue ではなく、<a href="https://github.com/danst0/passwordgenerator/security/advisories/new">GitHub から非公開で報告</a>してください。通常 72 時間以内に受領をお知らせし、修正後に詳細を公開します。</p>
+</section>
+
+<!-- ──────────────────────── install ──────────────────────── -->
+<section id="install">
+  <p class="sec-label"><b>03</b> インストール</p>
+  <h2>コマンドひとつで完了。</h2>
+
+  <div class="install-grid">
+    <div class="install-card reveal">
+      <h3>Flathub</h3>
+      <p>どの Linux ディストリビューションでも推奨される方法です。現在は GNOME 50 ランタイムを使用し、リリースごとに自動で更新されます。</p>
+      <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+        <img src="../assets/flathub-badge-ja.svg" alt="Flathub で入手" width="240" height="80">
+      </a>
+      <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">flatpak install flathub io.github.danst0.passwordgenerator</button>
+    </div>
+
+    <div class="install-card reveal">
+      <h3>ソースコードから</h3>
+      <p>Rust と GTK4 の開発用ライブラリが必要です。自分でビルドしたり改変したりしたい方へ。</p>
+      <button class="cmd" data-copy="git clone https://github.com/danst0/passwordgenerator &amp;&amp; cd passwordgenerator &amp;&amp; cargo build">git clone …/passwordgenerator &amp;&amp; cargo build</button>
+      <span class="alt"><a href="https://github.com/danst0/passwordgenerator">GitHub のソースコード</a></span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="meaning"><b>パスワード</b> ― 門をくぐるための合言葉。ここでは、あなただけが知る言葉。ミリ秒で生成し、ワンクリックでコピーし、どこにも保存しません。</p>
+  <nav>
+    <a href="https://github.com/danst0/passwordgenerator">GitHub</a>
+    <a href="https://flathub.org/apps/io.github.danst0.passwordgenerator">Flathub</a>
+    <a href="../.well-known/security.txt">security.txt</a>
+    <a href="https://github.com/danst0/passwordgenerator/blob/main/LICENSE">CC BY-SA 4.0</a>
+  </nav>
+  <nav id="languages" class="langs" aria-label="言語">
+    <a href="../" hreflang="en" lang="en" data-lang="en">English</a>
+    <a href="../de/" hreflang="de" lang="de" data-lang="de">Deutsch</a>
+    <a href="../fr/" hreflang="fr" lang="fr" data-lang="fr">Français</a>
+    <a href="../es/" hreflang="es" lang="es" data-lang="es">Español</a>
+    <a href="../it/" hreflang="it" lang="it" data-lang="it">Italiano</a>
+    <a href="../sv/" hreflang="sv" lang="sv" data-lang="sv">Svenska</a>
+    <a href="../uk/" hreflang="uk" lang="uk" data-lang="uk">Українська</a>
+    <a href="../ja/" hreflang="ja" lang="ja" data-lang="ja" aria-current="page">日本語</a>
+  </nav>
+  <p>このサイトは Cookie を使用せず、第三者のリソースも読み込みません。</p>
+  <p>© Dr. Daniel Dumke</p>
+</footer>
+</div>
+
+<script src="../site.js"></script>
+</body>
+</html>

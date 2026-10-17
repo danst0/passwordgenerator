@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Генератор паролів — надійні паролі, повністю офлайн</title>
+<meta name="description" content="Нативний застосунок GTK4 для GNOME: криптографічно стійкі паролі, згенеровані локально, — без мережі, без хмари, без телеметрії. На Flathub, вісьмома мовами.">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="canonical" href="https://passwort.dumke.me/uk/">
+<link rel="alternate" hreflang="en" href="https://passwort.dumke.me/">
+<link rel="alternate" hreflang="de" href="https://passwort.dumke.me/de/">
+<link rel="alternate" hreflang="fr" href="https://passwort.dumke.me/fr/">
+<link rel="alternate" hreflang="es" href="https://passwort.dumke.me/es/">
+<link rel="alternate" hreflang="it" href="https://passwort.dumke.me/it/">
+<link rel="alternate" hreflang="sv" href="https://passwort.dumke.me/sv/">
+<link rel="alternate" hreflang="uk" href="https://passwort.dumke.me/uk/">
+<link rel="alternate" hreflang="ja" href="https://passwort.dumke.me/ja/">
+<link rel="alternate" hreflang="x-default" href="https://passwort.dumke.me/">
+<meta property="og:title" content="Генератор паролів — надійні паролі, повністю офлайн">
+<meta property="og:description" content="Нативний застосунок GTK4 для GNOME: криптографічно стійкі паролі, згенеровані локально, — без мережі, без хмари, без телеметрії. На Flathub, вісьмома мовами.">
+<meta property="og:image" content="https://passwort.dumke.me/assets/dark_en.png">
+<meta property="og:url" content="https://passwort.dumke.me/uk/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="uk_UA">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-copied="скопійовано ✓">
+
+<div class="wrap">
+<header>
+  <img src="../assets/icon.png" alt="" width="34" height="34">
+  <a class="brand" href="./">Генератор паролів</a>
+  <nav>
+    <a href="#features">Переваги</a>
+    <a href="#security">Безпека</a>
+    <a href="#install">Встановлення</a>
+    <a class="gh" href="https://github.com/danst0/passwordgenerator">GitHub&nbsp;↗</a>
+    <a class="lang-link" href="#languages" title="Мова">UK</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ───────────────────────── hero ───────────────────────── -->
+<section class="hero">
+  <p class="kicker">Вільне ПЗ · GNOME · повністю офлайн</p>
+  <h1>Надійний пароль. <em>Лише у вас.</em></h1>
+  <p class="lede">Генератор паролів — це нативний застосунок GTK4 для GNOME. Він створює криптографічно стійкі паролі <strong>просто на вашому комп’ютері</strong> — групами по п’ять символів, за один клік від буфера обміну. Без мережі. Без хмари. Без телеметрії.</p>
+
+  <div class="cta-row">
+    <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+      <img src="../assets/flathub-badge-uk.svg" alt="Завантажити з Flathub" width="240" height="80">
+    </a>
+    <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">
+      flatpak install flathub io.github.danst0.passwordgenerator
+    </button>
+  </div>
+
+  <div class="desk">
+    <figure class="app-card" aria-label="Вікно Генератора паролів зі щойно згенерованим паролем">
+      <div class="file-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">Генератор паролів</span>
+      </div>
+      <pre class="app-lines"><span class="typed-wrap"><span class="typed">hT4k#-qW9m!-Lp2xZ</span><span class="caret"></span></span></pre>
+      <div class="app-chips">
+        <button type="button" class="chip green egg" aria-label="Скопіювати показаний пароль" data-done="Справді скопійовано ✓">Скопійовано ✓</button>
+        <span class="chip dim">10 с до закриття</span>
+      </div>
+    </figure>
+
+    <div class="strength-card" role="img" aria-label="Індикатор надійності: 91,9 біт ентропії, оцінка «Надійний», орієнтовний час офлайнової атаки 75 мільйонів років">
+      <p class="strength-title">Надійність</p>
+      <div class="chips">
+        <span class="chip blue">Ентропія 91,9 біт</span>
+        <span class="chip green">Надійний</span>
+        <span class="chip red">Офлайнова атака: 7,5 × 10⁷ років</span>
+      </div>
+      <p class="strength-note">Точне значення, оцінка й орієнтовний час атаки повним перебором — із чесно названим припущенням (10¹² спроб/с, швидкий хеш), а не як реклама.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────── features ─────────────────────── -->
+<section id="features">
+  <p class="sec-label"><b>01</b> Переваги</p>
+  <h2>Ваш пароль залишається на вашому комп’ютері.</h2>
+  <p class="sec-intro">Усе працює локально — у застосунку GTK4, запакованому у Flatpak. Немає сервера, який міг би щось зберегти, втратити чи передати, і для цього нічого не потрібно налаштовувати.</p>
+
+  <div class="shots">
+    <div class="shot reveal">
+      <img src="../assets/dark_en.png" alt="Вікно в темному режимі: пароль, набори символів і параметри">
+    </div>
+    <div class="shot shot-small reveal">
+      <img src="../assets/light_en.png" alt="Вікно у світлому режимі">
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature reveal"><span class="check">[x]</span><h3>100 % офлайн</h3>
+      <p>Жодного доступу до мережі — ні у Flatpak, ні в коді. Жодних облікових записів, хмари чи телеметрії: тут просто нічого втратити, викрасти чи продати.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Криптографічна випадковість</h3>
+      <p>Кожен символ береться з генератора випадкових чисел операційної системи (OsRng) — того самого джерела, з якого програми шифрування отримують свої ключі.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Групи по п’ять</h3>
+      <p><code>abcde-FGHIJ-12345</code> легше читати, диктувати й набирати, ніж мішанину символів, — а довжину видно одразу.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Чесна оцінка надійності</h3>
+      <p>Точна ентропія, оцінка й орієнтовний час атаки. Припущення (10¹² спроб/с, швидкий хеш) вказано явно — і стандартну стратегію ніколи не подано надійнішою, ніж вона є.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Один клік — і готово</h3>
+      <p>Пароль одразу потрапляє в буфер обміну — за бажанням уже під час запуску — з помітним підтвердженням. Потім вікно закривається саме: пароль зникає з екрана, але його досі можна вставити.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Під будь-яку політику</h3>
+      <p>Малі й великі літери, цифри та спецсимволи можна вимикати окремо. Стандартна стратегія гарантує щонайменше одну велику літеру, одну цифру й один спецсимвол.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Вісім мов</h3>
+      <p>Українська, англійська, іспанська, італійська, німецька, французька, шведська та японська — інтерфейс використовує мову системи.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Органічно в системі</h3>
+      <p>Світла чи темна тема — відповідно до налаштувань системи. Enter створює новий пароль, Ctrl+W закриває вікно, Ctrl+Q завершує роботу — миша не потрібна.</p></div>
+  </div>
+</section>
+
+<!-- ──────────────────────── security ─────────────────────── -->
+<section id="security">
+  <p class="sec-label"><b>02</b> Безпека</p>
+  <h2>Створено локально, ніде не збережено.</h2>
+  <p class="sec-intro">Генератор навмисно невеликий: GTK4 для інтерфейсу, <code>rand</code> для випадковості, кілька бібліотек Wayland для буфера обміну. Жодних облікових записів, зовнішніх з’єднань чи фонових служб. Основні властивості:</p>
+
+  <div class="sec-grid">
+    <div class="sec-item reveal">
+      <h3><span class="no">a.</span>Без мережі</h3>
+      <p>Flatpak не запитує <code>--share=network</code>, а код не містить жодного доступу до мережі. Навіть якби генератор хотів, він не зміг би нічого надіслати.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">b.</span>Без журналів та історії</h3>
+      <p>Паролі ніколи не з’являються в консолі чи системному журналі й ніколи не записуються на диск. Зберігаються лише ваші налаштування.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">c.</span>Недовго на екрані</h3>
+      <p>З увімкненим «Автозакриттям» застосунок закривається через 10 секунд; клік у вікні зупиняє зворотний відлік. Пароль залишається в буфері обміну, доки ви не скопіюєте щось інше, — якщо ви користуєтеся історією буфера обміну, видаліть його звідти.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">d.</span>Прозоро</h3>
+      <p>Відкритий код за ліцензією CC BY-SA 4.0: генерацію, обчислення ентропії та оцінку надійності можна перевірити в коді, і їх покрито тестами.</p>
+    </div>
+  </div>
+
+  <div class="terminal reveal" aria-label="security.txt: як повідомити про вразливість">
+    <div class="file-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="name">security.txt</span>
+    </div>
+<pre>
+Contact: https://github.com/danst0/passwordgenerator/security/advisories/new
+Expires: 2027-10-17T00:00:00.000Z
+Policy: https://github.com/danst0/passwordgenerator/blob/main/SECURITY.md
+Preferred-Languages: en, de
+Canonical: https://passwort.dumke.me/.well-known/security.txt
+</pre>
+  </div>
+  <p class="sec-report">Знайшли вразливість? <a href="https://github.com/danst0/passwordgenerator/security/advisories/new">Повідомте про неї приватно через GitHub</a>, а не в публічному issue. Зазвичай я підтверджую отримання протягом 72 годин; подробиці публікуються після виправлення.</p>
+</section>
+
+<!-- ──────────────────────── install ──────────────────────── -->
+<section id="install">
+  <p class="sec-label"><b>03</b> Встановлення</p>
+  <h2>Одна команда — і все готово.</h2>
+
+  <div class="install-grid">
+    <div class="install-card reveal">
+      <h3>Flathub</h3>
+      <p>Рекомендований спосіб для будь-якого дистрибутива Linux: зараз на середовищі виконання GNOME 50, з автоматичним оновленням для кожного нового випуску.</p>
+      <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+        <img src="../assets/flathub-badge-uk.svg" alt="Завантажити з Flathub" width="240" height="80">
+      </a>
+      <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">flatpak install flathub io.github.danst0.passwordgenerator</button>
+    </div>
+
+    <div class="install-card reveal">
+      <h3>З вихідного коду</h3>
+      <p>Потрібні Rust і бібліотеки розробки GTK4 — для тих, хто хоче зібрати чи змінити застосунок самостійно.</p>
+      <button class="cmd" data-copy="git clone https://github.com/danst0/passwordgenerator &amp;&amp; cd passwordgenerator &amp;&amp; cargo build">git clone …/passwordgenerator &amp;&amp; cargo build</button>
+      <span class="alt"><a href="https://github.com/danst0/passwordgenerator">Вихідний код на GitHub</a></span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="meaning"><b>Пароль</b> — слово, що відчиняє браму. Тут — слово, яке знаєте лише ви. Згенеровано за мілісекунди, скопійовано одним кліком, ніде не збережено.</p>
+  <nav>
+    <a href="https://github.com/danst0/passwordgenerator">GitHub</a>
+    <a href="https://flathub.org/apps/io.github.danst0.passwordgenerator">Flathub</a>
+    <a href="../.well-known/security.txt">security.txt</a>
+    <a href="https://github.com/danst0/passwordgenerator/blob/main/LICENSE">CC BY-SA 4.0</a>
+  </nav>
+  <nav id="languages" class="langs" aria-label="Мова">
+    <a href="../" hreflang="en" lang="en" data-lang="en">English</a>
+    <a href="../de/" hreflang="de" lang="de" data-lang="de">Deutsch</a>
+    <a href="../fr/" hreflang="fr" lang="fr" data-lang="fr">Français</a>
+    <a href="../es/" hreflang="es" lang="es" data-lang="es">Español</a>
+    <a href="../it/" hreflang="it" lang="it" data-lang="it">Italiano</a>
+    <a href="../sv/" hreflang="sv" lang="sv" data-lang="sv">Svenska</a>
+    <a href="../uk/" hreflang="uk" lang="uk" data-lang="uk" aria-current="page">Українська</a>
+    <a href="../ja/" hreflang="ja" lang="ja" data-lang="ja">日本語</a>
+  </nav>
+  <p>Цей сайт не використовує cookie й нічого не завантажує зі сторонніх ресурсів.</p>
+  <p>© Dr. Daniel Dumke</p>
+</footer>
+</div>
+
+<script src="../site.js"></script>
+</body>
+</html>

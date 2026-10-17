@@ -520,6 +520,20 @@ footer .meaning {
 }
 footer .meaning b { color: var(--blue); font-weight: 400; }
 footer nav { display: flex; flex-wrap: wrap; gap: 1.6rem; font-family: var(--mono); font-size: 0.78rem; }
+footer nav.langs { gap: 0.4rem 1.2rem; }
+footer nav.langs a[aria-current] { color: var(--ink); text-decoration: none; font-weight: 500; }
+
+header nav a.lang-link {
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
+/* Japanisch: keine schräggestellten CJK-Zeichen, Umbruch an Phrasen */
+:lang(ja) em { font-style: normal; }
+:lang(ja) h1, :lang(ja) h2 { word-break: auto-phrase; letter-spacing: 0; }
+:lang(ja) h1 { font-size: clamp(2.2rem, 5.2vw, 3.8rem); line-height: 1.25; max-width: 13em; }
+:lang(ja) h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.4; max-width: 22em; }
 
 /* ── reveal on scroll ─────────────────────────────────────────── */
 
@@ -549,5 +563,5 @@ footer nav { display: flex; flex-wrap: wrap; gap: 1.6rem; font-family: var(--mon
 }
 
 @media (max-width: 30rem) {
-  header nav a[href="#vorteile"], header nav a[href="#sicherheit"] { display: none; }
+  header nav a[href="#features"], header nav a[href="#security"] { display: none; }
 }

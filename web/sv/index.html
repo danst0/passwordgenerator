@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lösenordsgenerator — starka lösenord, helt offline</title>
+<meta name="description" content="En inbyggd GTK4-app för GNOME: kryptografiskt starka lösenord som skapas lokalt — utan nätverk, utan moln, utan telemetri. På Flathub, på åtta språk.">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="canonical" href="https://passwort.dumke.me/sv/">
+<link rel="alternate" hreflang="en" href="https://passwort.dumke.me/">
+<link rel="alternate" hreflang="de" href="https://passwort.dumke.me/de/">
+<link rel="alternate" hreflang="fr" href="https://passwort.dumke.me/fr/">
+<link rel="alternate" hreflang="es" href="https://passwort.dumke.me/es/">
+<link rel="alternate" hreflang="it" href="https://passwort.dumke.me/it/">
+<link rel="alternate" hreflang="sv" href="https://passwort.dumke.me/sv/">
+<link rel="alternate" hreflang="uk" href="https://passwort.dumke.me/uk/">
+<link rel="alternate" hreflang="ja" href="https://passwort.dumke.me/ja/">
+<link rel="alternate" hreflang="x-default" href="https://passwort.dumke.me/">
+<meta property="og:title" content="Lösenordsgenerator — starka lösenord, helt offline">
+<meta property="og:description" content="En inbyggd GTK4-app för GNOME: kryptografiskt starka lösenord som skapas lokalt — utan nätverk, utan moln, utan telemetri. På Flathub, på åtta språk.">
+<meta property="og:image" content="https://passwort.dumke.me/assets/dark_sv.png">
+<meta property="og:url" content="https://passwort.dumke.me/sv/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sv_SE">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-copied="kopierat ✓">
+
+<div class="wrap">
+<header>
+  <img src="../assets/icon.png" alt="" width="34" height="34">
+  <a class="brand" href="./">Lösenordsgenerator</a>
+  <nav>
+    <a href="#features">Fördelar</a>
+    <a href="#security">Säkerhet</a>
+    <a href="#install">Installera</a>
+    <a class="gh" href="https://github.com/danst0/passwordgenerator">GitHub&nbsp;↗</a>
+    <a class="lang-link" href="#languages" title="Språk">SV</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ───────────────────────── hero ───────────────────────── -->
+<section class="hero">
+  <p class="kicker">Fri programvara · GNOME · helt offline</p>
+  <h1>Starkt lösenord. <em>Bara hos dig.</em></h1>
+  <p class="lede">Lösenordsgenerator är en inbyggd GTK4-app för GNOME. Den skapar kryptografiskt starka lösenord <strong>direkt på din dator</strong> — i grupper om fem tecken, ett klick från urklippet. Inget nätverk. Inget moln. Ingen telemetri.</p>
+
+  <div class="cta-row">
+    <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+      <img src="../assets/flathub-badge-sv.svg" alt="Hämta på Flathub" width="240" height="80">
+    </a>
+    <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">
+      flatpak install flathub io.github.danst0.passwordgenerator
+    </button>
+  </div>
+
+  <div class="desk">
+    <figure class="app-card" aria-label="Lösenordsgeneratorns fönster med ett nyskapat lösenord">
+      <div class="file-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">Lösenordsgenerator</span>
+      </div>
+      <pre class="app-lines"><span class="typed-wrap"><span class="typed">hT4k#-qW9m!-Lp2xZ</span><span class="caret"></span></span></pre>
+      <div class="app-chips">
+        <button type="button" class="chip green egg" aria-label="Kopiera det visade lösenordet" data-done="Verkligen kopierat ✓">Kopierat ✓</button>
+        <span class="chip dim">Stänger om 10 s</span>
+      </div>
+    </figure>
+
+    <div class="strength-card" role="img" aria-label="Styrkeindikator: 91,9 bitar entropi, bedömt som starkt, uppskattad tid för en offlineattack 75 miljoner år">
+      <p class="strength-title">Styrka</p>
+      <div class="chips">
+        <span class="chip blue">91,9 bitar entropi</span>
+        <span class="chip green">Starkt</span>
+        <span class="chip red">Offlineattack: 7,5 × 10⁷ år</span>
+      </div>
+      <p class="strength-note">Exakt värde, bedömning och uppskattad tid för en brute force-attack — med antagandet tydligt angivet (10¹² gissningar/s, snabb hash), inte som reklam.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────── features ─────────────────────── -->
+<section id="features">
+  <p class="sec-label"><b>01</b> Fördelar</p>
+  <h2>Ditt lösenord stannar på din dator.</h2>
+  <p class="sec-intro">Allt körs lokalt i en GTK4-app, paketerad som Flatpak. Det finns ingen server som kan lagra, tappa bort eller dela något — och inget du behöver ställa in för det.</p>
+
+  <div class="shots">
+    <div class="shot reveal">
+      <img src="../assets/dark_sv.png" alt="Fönstret i mörkt läge med lösenord, teckenuppsättningar och alternativ">
+    </div>
+    <div class="shot shot-small reveal">
+      <img src="../assets/light_sv.png" alt="Fönstret i ljust läge">
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature reveal"><span class="check">[x]</span><h3>100 % offline</h3>
+      <p>Ingen nätverksåtkomst — varken i Flatpaken eller i koden. Inga konton, inget moln, ingen telemetri: det finns helt enkelt inget som kan gå förlorat, stjälas eller säljas.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Kryptografisk slump</h3>
+      <p>Varje tecken kommer från operativsystemets slumptalsgenerator (OsRng) — samma källa som krypteringsprogram hämtar sina nycklar från.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Grupper om fem</h3>
+      <p><code>abcde-FGHIJ-12345</code> är lättare att läsa, diktera och skriva än en teckengröt — och längden syns direkt.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Ärlig styrka</h3>
+      <p>Exakt entropi, bedömning och uppskattad attacktid. Antagandet bakom (10¹² gissningar/s, snabb hash) visas — och standardstrategin anges aldrig som starkare än den är.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Ett klick, klart</h3>
+      <p>Lösenordet hamnar direkt i urklippet, om du vill redan vid start, med tydlig bekräftelse. Sedan stängs fönstret av sig självt: lösenordet försvinner från skärmen men kan fortfarande klistras in.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Passar alla policyer</h3>
+      <p>Gemener, versaler, siffror och specialtecken kan stängas av var för sig. Standardstrategin garanterar minst en versal, en siffra och ett specialtecken.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Åtta språk</h3>
+      <p>Svenska, engelska, franska, italienska, japanska, spanska, tyska och ukrainska — gränssnittet följer systemspråket.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Smälter in i systemet</h3>
+      <p>Ljust eller mörkt enligt systeminställningen. Enter skapar ett nytt lösenord, Ctrl+W stänger fönstret, Ctrl+Q avslutar — ingen mus behövs.</p></div>
+  </div>
+</section>
+
+<!-- ──────────────────────── security ─────────────────────── -->
+<section id="security">
+  <p class="sec-label"><b>02</b> Säkerhet</p>
+  <h2>Skapat lokalt, sparat ingenstans.</h2>
+  <p class="sec-intro">Generatorn är medvetet liten: GTK4 för gränssnittet, <code>rand</code> för slumpen, några Wayland-bibliotek för urklippet. Inga konton, inga externa anslutningar, inga bakgrundstjänster. De viktigaste egenskaperna:</p>
+
+  <div class="sec-grid">
+    <div class="sec-item reveal">
+      <h3><span class="no">a.</span>Inget nätverk</h3>
+      <p>Flatpaken begär inte <code>--share=network</code>, och koden innehåller ingen nätverksåtkomst. Även om den ville kunde generatorn inte skicka något.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">b.</span>Inga loggar, ingen historik</h3>
+      <p>Lösenord visas aldrig i konsolen eller i systemjournalen och skrivs aldrig till disk. Bara dina inställningar sparas.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">c.</span>Kort tid på skärmen</h3>
+      <p>Med ”Stäng automatiskt” avslutas appen efter 10 sekunder; ett klick i fönstret pausar nedräkningen. Lösenordet ligger kvar i urklippet tills du kopierar något annat — använder du en urklippshistorik bör du radera det där.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">d.</span>Granskningsbart</h3>
+      <p>Öppen källkod under CC BY-SA 4.0: generering, entropiberäkning och styrkeuppskattning kan granskas i koden och täcks av tester.</p>
+    </div>
+  </div>
+
+  <div class="terminal reveal" aria-label="security.txt: så rapporterar du sårbarheter">
+    <div class="file-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="name">security.txt</span>
+    </div>
+<pre>
+Contact: https://github.com/danst0/passwordgenerator/security/advisories/new
+Expires: 2027-10-17T00:00:00.000Z
+Policy: https://github.com/danst0/passwordgenerator/blob/main/SECURITY.md
+Preferred-Languages: en, de
+Canonical: https://passwort.dumke.me/.well-known/security.txt
+</pre>
+  </div>
+  <p class="sec-report">Hittat en sårbarhet? <a href="https://github.com/danst0/passwordgenerator/security/advisories/new">Rapportera den privat via GitHub</a>, inte som ett offentligt ärende. Jag bekräftar normalt rapporter inom 72 timmar; detaljer publiceras när en rättning finns.</p>
+</section>
+
+<!-- ──────────────────────── install ──────────────────────── -->
+<section id="install">
+  <p class="sec-label"><b>03</b> Installera</p>
+  <h2>Ett kommando, sedan är den på plats.</h2>
+
+  <div class="install-grid">
+    <div class="install-card reveal">
+      <h3>Flathub</h3>
+      <p>Det rekommenderade sättet på alla Linuxdistributioner: för närvarande på körtidsmiljön GNOME 50 och uppdateras automatiskt vid varje ny version.</p>
+      <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+        <img src="../assets/flathub-badge-sv.svg" alt="Hämta på Flathub" width="240" height="80">
+      </a>
+      <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">flatpak install flathub io.github.danst0.passwordgenerator</button>
+    </div>
+
+    <div class="install-card reveal">
+      <h3>Från källkod</h3>
+      <p>Med Rust och GTK4-utvecklingsbiblioteken — för dig som vill bygga eller ändra själv.</p>
+      <button class="cmd" data-copy="git clone https://github.com/danst0/passwordgenerator &amp;&amp; cd passwordgenerator &amp;&amp; cargo build">git clone …/passwordgenerator &amp;&amp; cargo build</button>
+      <span class="alt"><a href="https://github.com/danst0/passwordgenerator">Källkoden på GitHub</a></span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="meaning"><b>Lösenord</b> — ordet som släpper in dig genom porten. Här: ett ord som bara du känner till. Skapat på millisekunder, kopierat med ett klick, sparat ingenstans.</p>
+  <nav>
+    <a href="https://github.com/danst0/passwordgenerator">GitHub</a>
+    <a href="https://flathub.org/apps/io.github.danst0.passwordgenerator">Flathub</a>
+    <a href="../.well-known/security.txt">security.txt</a>
+    <a href="https://github.com/danst0/passwordgenerator/blob/main/LICENSE">CC BY-SA 4.0</a>
+  </nav>
+  <nav id="languages" class="langs" aria-label="Språk">
+    <a href="../" hreflang="en" lang="en" data-lang="en">English</a>
+    <a href="../de/" hreflang="de" lang="de" data-lang="de">Deutsch</a>
+    <a href="../fr/" hreflang="fr" lang="fr" data-lang="fr">Français</a>
+    <a href="../es/" hreflang="es" lang="es" data-lang="es">Español</a>
+    <a href="../it/" hreflang="it" lang="it" data-lang="it">Italiano</a>
+    <a href="../sv/" hreflang="sv" lang="sv" data-lang="sv" aria-current="page">Svenska</a>
+    <a href="../uk/" hreflang="uk" lang="uk" data-lang="uk">Українська</a>
+    <a href="../ja/" hreflang="ja" lang="ja" data-lang="ja">日本語</a>
+  </nav>
+  <p>Den här webbplatsen sätter inga kakor och laddar inget från tredje part.</p>
+  <p>© Dr. Daniel Dumke</p>
+</footer>
+</div>
+
+<script src="../site.js"></script>
+</body>
+</html>

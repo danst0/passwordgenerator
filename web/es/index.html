@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador de contraseñas — contraseñas robustas, totalmente sin conexión</title>
+<meta name="description" content="Una app nativa GTK4 para GNOME: contraseñas criptográficamente robustas generadas en local, sin red, sin nube y sin telemetría. En Flathub y en ocho idiomas.">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="canonical" href="https://passwort.dumke.me/es/">
+<link rel="alternate" hreflang="en" href="https://passwort.dumke.me/">
+<link rel="alternate" hreflang="de" href="https://passwort.dumke.me/de/">
+<link rel="alternate" hreflang="fr" href="https://passwort.dumke.me/fr/">
+<link rel="alternate" hreflang="es" href="https://passwort.dumke.me/es/">
+<link rel="alternate" hreflang="it" href="https://passwort.dumke.me/it/">
+<link rel="alternate" hreflang="sv" href="https://passwort.dumke.me/sv/">
+<link rel="alternate" hreflang="uk" href="https://passwort.dumke.me/uk/">
+<link rel="alternate" hreflang="ja" href="https://passwort.dumke.me/ja/">
+<link rel="alternate" hreflang="x-default" href="https://passwort.dumke.me/">
+<meta property="og:title" content="Generador de contraseñas — contraseñas robustas, totalmente sin conexión">
+<meta property="og:description" content="Una app nativa GTK4 para GNOME: contraseñas criptográficamente robustas generadas en local, sin red, sin nube y sin telemetría. En Flathub y en ocho idiomas.">
+<meta property="og:image" content="https://passwort.dumke.me/assets/dark_es.png">
+<meta property="og:url" content="https://passwort.dumke.me/es/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-copied="copiado ✓">
+
+<div class="wrap">
+<header>
+  <img src="../assets/icon.png" alt="" width="34" height="34">
+  <a class="brand" href="./">Generador de contraseñas</a>
+  <nav>
+    <a href="#features">Ventajas</a>
+    <a href="#security">Seguridad</a>
+    <a href="#install">Instalar</a>
+    <a class="gh" href="https://github.com/danst0/passwordgenerator">GitHub&nbsp;↗</a>
+    <a class="lang-link" href="#languages" title="Idioma">ES</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ───────────────────────── hero ───────────────────────── -->
+<section class="hero">
+  <p class="kicker">Software libre · GNOME · totalmente sin conexión</p>
+  <h1>Contraseña robusta. <em>Solo tuya.</em></h1>
+  <p class="lede">Generador de contraseñas es una app nativa GTK4 para GNOME. Crea contraseñas criptográficamente robustas <strong>directamente en tu ordenador</strong>, en grupos de cinco caracteres y a un clic del portapapeles. Sin red. Sin nube. Sin telemetría.</p>
+
+  <div class="cta-row">
+    <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+      <img src="../assets/flathub-badge-es.svg" alt="Disponible en Flathub" width="240" height="80">
+    </a>
+    <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">
+      flatpak install flathub io.github.danst0.passwordgenerator
+    </button>
+  </div>
+
+  <div class="desk">
+    <figure class="app-card" aria-label="La ventana del Generador de contraseñas con una contraseña recién generada">
+      <div class="file-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="name">Generador de contraseñas</span>
+      </div>
+      <pre class="app-lines"><span class="typed-wrap"><span class="typed">hT4k#-qW9m!-Lp2xZ</span><span class="caret"></span></span></pre>
+      <div class="app-chips">
+        <button type="button" class="chip green egg" aria-label="Copiar la contraseña mostrada" data-done="Copiado de verdad ✓">Copiado ✓</button>
+        <span class="chip dim">Se cierra en 10 s</span>
+      </div>
+    </figure>
+
+    <div class="strength-card" role="img" aria-label="Indicador de robustez: 91,9 bits de entropía, valoración «Fuerte», tiempo estimado de un ataque offline 75 millones de años">
+      <p class="strength-title">Robustez</p>
+      <div class="chips">
+        <span class="chip blue">91,9 bits de entropía</span>
+        <span class="chip green">Fuerte</span>
+        <span class="chip red">Ataque offline: 7,5 × 10⁷ años</span>
+      </div>
+      <p class="strength-note">El valor exacto, una valoración y el tiempo estimado de un ataque de fuerza bruta, con la suposición indicada (10¹² intentos/s, hash rápido), no como reclamo publicitario.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────── features ─────────────────────── -->
+<section id="features">
+  <p class="sec-label"><b>01</b> Ventajas</p>
+  <h2>Tu contraseña no sale de tu ordenador.</h2>
+  <p class="sec-intro">Todo se ejecuta en local, en una app GTK4 empaquetada como Flatpak. No hay ningún servidor que pueda guardar, perder o compartir nada, y no tienes que configurar nada para ello.</p>
+
+  <div class="shots">
+    <div class="shot reveal">
+      <img src="../assets/dark_es.png" alt="La ventana en modo oscuro, con contraseña, juegos de caracteres y opciones">
+    </div>
+    <div class="shot shot-small reveal">
+      <img src="../assets/light_es.png" alt="La ventana en modo claro">
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature reveal"><span class="check">[x]</span><h3>100 % sin conexión</h3>
+      <p>Sin acceso a la red, ni en el Flatpak ni en el código. Sin cuentas, sin nube, sin telemetría: sencillamente no hay nada que se pueda perder, robar o vender.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Aleatoriedad criptográfica</h3>
+      <p>Cada carácter procede del generador de números aleatorios del sistema operativo (OsRng), la misma fuente de la que el software de cifrado obtiene sus claves.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Grupos de cinco</h3>
+      <p><code>abcde-FGHIJ-12345</code> es más fácil de leer, dictar y teclear que una maraña de caracteres, y la longitud se ve de un vistazo.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Robustez honesta</h3>
+      <p>Entropía exacta, valoración y tiempo estimado de ataque. Se indica la suposición (10¹² intentos/s, hash rápido) y la estrategia predeterminada nunca se presenta como más robusta de lo que es.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Un clic y listo</h3>
+      <p>La contraseña va directa al portapapeles, si quieres ya al iniciar, con una confirmación visible. Después la ventana se cierra sola: la contraseña desaparece de la pantalla, pero se puede seguir pegando.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Se adapta a cualquier política</h3>
+      <p>Minúsculas, mayúsculas, dígitos y caracteres especiales se pueden desactivar por separado. La estrategia predeterminada garantiza al menos una mayúscula, un dígito y un carácter especial.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Ocho idiomas</h3>
+      <p>Español, alemán, francés, inglés, italiano, japonés, sueco y ucraniano: la interfaz sigue el idioma del sistema.</p></div>
+    <div class="feature reveal"><span class="check">[x]</span><h3>Se integra en el sistema</h3>
+      <p>Claro u oscuro según la configuración del sistema. Intro genera una contraseña nueva, Ctrl+W cierra la ventana, Ctrl+Q sale de la app: no hace falta el ratón.</p></div>
+  </div>
+</section>
+
+<!-- ──────────────────────── security ─────────────────────── -->
+<section id="security">
+  <p class="sec-label"><b>02</b> Seguridad</p>
+  <h2>Generada en local, guardada en ninguna parte.</h2>
+  <p class="sec-intro">El generador es pequeño a propósito: GTK4 para la interfaz, <code>rand</code> para el azar y algunas bibliotecas de Wayland para el portapapeles. Sin cuentas, sin conexiones externas, sin servicios en segundo plano. Las propiedades clave:</p>
+
+  <div class="sec-grid">
+    <div class="sec-item reveal">
+      <h3><span class="no">a.</span>Sin red</h3>
+      <p>El Flatpak no solicita <code>--share=network</code> y el código no contiene ningún acceso a la red. Aunque quisiera, el generador no podría enviar nada.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">b.</span>Sin registros ni historial</h3>
+      <p>Las contraseñas nunca aparecen en la consola ni en el registro del sistema y nunca se escriben en el disco. Solo se guardan tus preferencias.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">c.</span>Poco tiempo en pantalla</h3>
+      <p>Con «Cierre automático», la app se cierra a los 10 segundos; un clic en la ventana detiene la cuenta atrás. La contraseña permanece en el portapapeles hasta que copies otra cosa; si usas un historial del portapapeles, bórrala de allí.</p>
+    </div>
+    <div class="sec-item reveal">
+      <h3><span class="no">d.</span>Verificable</h3>
+      <p>Código abierto bajo CC BY-SA 4.0: la generación, el cálculo de la entropía y la estimación de la robustez se pueden comprobar en el código y están cubiertos por pruebas.</p>
+    </div>
+  </div>
+
+  <div class="terminal reveal" aria-label="security.txt: cómo informar de vulnerabilidades">
+    <div class="file-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="name">security.txt</span>
+    </div>
+<pre>
+Contact: https://github.com/danst0/passwordgenerator/security/advisories/new
+Expires: 2027-10-17T00:00:00.000Z
+Policy: https://github.com/danst0/passwordgenerator/blob/main/SECURITY.md
+Preferred-Languages: en, de
+Canonical: https://passwort.dumke.me/.well-known/security.txt
+</pre>
+  </div>
+  <p class="sec-report">¿Has encontrado una vulnerabilidad? <a href="https://github.com/danst0/passwordgenerator/security/advisories/new">Infórmala de forma privada a través de GitHub</a>, no como issue público. Normalmente confirmo la recepción en un plazo de 72 horas; los detalles se publican cuando hay una corrección.</p>
+</section>
+
+<!-- ──────────────────────── install ──────────────────────── -->
+<section id="install">
+  <p class="sec-label"><b>03</b> Instalar</p>
+  <h2>Un solo comando y ya la tienes.</h2>
+
+  <div class="install-grid">
+    <div class="install-card reveal">
+      <h3>Flathub</h3>
+      <p>La forma recomendada en cualquier distribución Linux: actualmente sobre el runtime de GNOME 50 y actualizada automáticamente con cada versión nueva.</p>
+      <a class="flathub" href="https://flathub.org/apps/io.github.danst0.passwordgenerator">
+        <img src="../assets/flathub-badge-es.svg" alt="Disponible en Flathub" width="240" height="80">
+      </a>
+      <button class="cmd" data-copy="flatpak install flathub io.github.danst0.passwordgenerator">flatpak install flathub io.github.danst0.passwordgenerator</button>
+    </div>
+
+    <div class="install-card reveal">
+      <h3>Desde el código fuente</h3>
+      <p>Con Rust y las bibliotecas de desarrollo de GTK4, para quien quiera compilarla o modificarla por su cuenta.</p>
+      <button class="cmd" data-copy="git clone https://github.com/danst0/passwordgenerator &amp;&amp; cd passwordgenerator &amp;&amp; cargo build">git clone …/passwordgenerator &amp;&amp; cargo build</button>
+      <span class="alt"><a href="https://github.com/danst0/passwordgenerator">Código fuente en GitHub</a></span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="meaning"><b>Contraseña</b>: la palabra que te deja cruzar la puerta. Aquí, una palabra que solo tú conoces. Generada en milisegundos, copiada con un clic, guardada en ninguna parte.</p>
+  <nav>
+    <a href="https://github.com/danst0/passwordgenerator">GitHub</a>
+    <a href="https://flathub.org/apps/io.github.danst0.passwordgenerator">Flathub</a>
+    <a href="../.well-known/security.txt">security.txt</a>
+    <a href="https://github.com/danst0/passwordgenerator/blob/main/LICENSE">CC BY-SA 4.0</a>
+  </nav>
+  <nav id="languages" class="langs" aria-label="Idioma">
+    <a href="../" hreflang="en" lang="en" data-lang="en">English</a>
+    <a href="../de/" hreflang="de" lang="de" data-lang="de">Deutsch</a>
+    <a href="../fr/" hreflang="fr" lang="fr" data-lang="fr">Français</a>
+    <a href="../es/" hreflang="es" lang="es" data-lang="es" aria-current="page">Español</a>
+    <a href="../it/" hreflang="it" lang="it" data-lang="it">Italiano</a>
+    <a href="../sv/" hreflang="sv" lang="sv" data-lang="sv">Svenska</a>
+    <a href="../uk/" hreflang="uk" lang="uk" data-lang="uk">Українська</a>
+    <a href="../ja/" hreflang="ja" lang="ja" data-lang="ja">日本語</a>
+  </nav>
+  <p>Este sitio no usa cookies ni carga nada de terceros.</p>
+  <p>© Dr. Daniel Dumke</p>
+</footer>
+</div>
+
+<script src="../site.js"></script>
+</body>
+</html>
