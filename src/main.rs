@@ -921,11 +921,23 @@ fn build_ui(app: &Application) {
 
     install_custom_css(&window);
 
+    // Title and countdown share the title widget: packed at the end, the
+    // countdown would shrink the symmetric space around the centered title
+    // and truncate long titles (e.g. Japanese). The title is not ellipsized,
+    // so the window grows to fit it.
     let header = gtk::HeaderBar::new();
+    let lbl_title = Label::new(Some(strings.app_title));
+    lbl_title.add_css_class("title");
     let lbl_timer = Label::new(None);
     lbl_timer.add_css_class("dim-label");
     lbl_timer.add_css_class("timer-label");
-    header.pack_end(&lbl_timer);
+    let title_box = gtk::Box::builder()
+        .orientation(Orientation::Horizontal)
+        .spacing(12)
+        .build();
+    title_box.append(&lbl_title);
+    title_box.append(&lbl_timer);
+    header.set_title_widget(Some(&title_box));
     window.set_titlebar(Some(&header));
 
     let box_container = gtk::Box::builder()
@@ -1438,6 +1450,9 @@ fn build_ui(app: &Application) {
         // Focus "New" so Enter regenerates; the spin button would otherwise
         // take the initial focus and show a focus ring.
         btn_gen.grab_focus();
+        // Taking the initial focus selected the spin button's text, and
+        // the selection stays visible after focus moves on.
+        spin_len.select_region(0, 0);
     });
 }
 
